@@ -21,12 +21,12 @@ services:
       - POSTGRES_PASSWORD=postgres
     labels:
       - traefik.enable=true
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.rule=Host(`guacamole.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.rule=Host(`remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.entrypoints=web,websecure
 
       # Redirect to /guacamole because they refuse to do it themselves.
-      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix.redirectregex.regex=^https://guacamole.${HOMELAB_BASE_DOMAIN}/$
-      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix.redirectregex.replacement=https://guacamole.${HOMELAB_BASE_DOMAIN}/guacamole
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix.redirectregex.regex=^https://remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}/$
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix.redirectregex.replacement=https://remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}/guacamole
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.middlewares=${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix
 
   postgres:

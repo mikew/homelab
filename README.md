@@ -6,9 +6,10 @@ I've used this to self-host my services for almost a decade. I've also used it t
 
 ## Requirements
 
-- docker
-- docker-compose
+- `docker`
+- `docker-compose`
 - One folder for "storage". That is, one folder to be shared with most containers, containing all of your music, movies, tv shows, and downloads.
+- A domain with [DNS supported by Traefik](https://doc.traefik.io/traefik/https/acme/#providers)
 
 ## Getting Started
 
@@ -162,7 +163,7 @@ Because some services need some folders / files created _just right_, or because
 
 Keep "techy general setup" in `README.md`, and any `USER_GUIDE.md` file will be rolled up in the `documentation` service.
 
-This generates a .md file at `/opt/homelab/ui/Homelab User Guide.md`, and a corresponding .html file. All IPs, hostnames, domain names, any of the homelab shell environment variables will be replaced with their actual values, so links actually work for people.
+This generates a .md file at `/opt/homelab/ui/Homelab User Guide.md`, and a corresponding .html file. All IPs, host name, domain names, any of the homelab shell environment variables will be replaced with their actual values, so links actually work for people.
 
 ## Permissions
 

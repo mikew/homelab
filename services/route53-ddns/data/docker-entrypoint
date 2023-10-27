@@ -43,7 +43,7 @@ EOF
 }
 
 change_rrsets () {
-  local recordset_array=($ROUTE53_RECORDSET)
+  IFS=' ' read -ra recordset_array <<< "$ROUTE53_RECORDSET"
   for recordset in "${recordset_array[@]}"; do
     SINGLE_ROUTE53_RECORDSET="$recordset" build_changebatch
     aws route53 change-resource-record-sets \

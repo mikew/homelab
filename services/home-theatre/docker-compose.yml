@@ -41,7 +41,7 @@ services:
       - ${HOMELAB_STORAGE_PATH}:/storage
     labels:
       - traefik.enable=true
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-plex.rule=Host(`home-theare.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-plex.rule=Host(`home-theatre.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-plex.entrypoints=web,websecure
       - traefik.http.services.${COMPOSE_PROJECT_NAME}-plex.loadbalancer.server.port=32400
 
@@ -50,4 +50,3 @@ networks:
     name: home-theatre
   reverse-proxy:
     external: true
-

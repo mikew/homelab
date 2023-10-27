@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+HOMELAB_BASE_DOMAIN=example.com
+export HOMELAB_BASE_DOMAIN
+
+HOMELAB_USER_ID=1000
+export HOMELAB_USER_ID
+HOMELAB_GROUP_ID=1000
+export HOMELAB_GROUP_ID
+
+HOMELAB_STORAGE_PATH=/storage
+export HOMELAB_STORAGE_PATH
+
+# Set this to "yes" if the machine uses NetworkManager.
+HOMELAB_USE_NETWORKMANAGER=
+export HOMELAB_USE_NETWORKMANAGER
+
+HOMELAB_LAN_NETMASK=16
+export HOMELAB_LAN_NETMASK
+
+# You shouldn't have to edit anything below.
+
+HOMELAB_ROOT=$(realpath "$(dirname "$0")/..")
+export HOMELAB_ROOT
+
+HOMELAB_HOST_NAME=$(cat /etc/hostname)
+export HOMELAB_HOST_NAME
+
+# `ip route` output isn't stable, so a regex is needed.
+DEFAULT_IP_ROUTE=$(/sbin/ip -4 route show default)
+HOMELAB_NIC=$(echo "$DEFAULT_IP_ROUTE" | sed -n 's/^.*dev \(\w*\) .*$/\1/p')
+export HOMELAB_NIC
+HOMELAB_HOST_LOCAL_IP=$(echo "$DEFAULT_IP_ROUTE" | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
+export HOMELAB_HOST_LOCAL_IP
+
+HOMELAB_LAN_CIDR=$(echo "$HOMELAB_HOST_LOCAL_IP" | sed 's/\.\([0-9]\+\)$/.0/')
+HOMELAB_LAN_CIDR="$HOMELAB_LAN_CIDR/$HOMELAB_LAN_NETMASK"
+export HOMELAB_LAN_CIDR
+HOMELAB_LAN_CIDR_FALLBACK="172.16.0.0/12,10.0.0.0/8,192.168.0.0/16"
+export HOMELAB_LAN_CIDR_FALLBACK
+
+if [ -f /etc/timezone ]; then
+  HOMELAB_TIMEZONE=$(cat /etc/timezone)
+else
+  eval $(timedatectl show | grep ^Timezone)
+  HOMELAB_TIMEZONE="$Timezone"
+fi
+export HOMELAB_TIMEZONE

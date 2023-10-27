@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Homelab Info
+Comment=
+Exec=/opt/homelab/ui/homelab-shell-env-debug
+Icon=system-software-update
+Terminal=true
+Type=Application

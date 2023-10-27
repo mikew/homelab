@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -ex
+
+mkdir -p persistent/survival
+chown -R "${HOMELAB_USER_ID}:${HOMELAB_GROUP_ID}" persistent/survival || true
+

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -ex
+
+run-project-hook() {
+  local hook="script/$1"
+
+  if [ -s "$hook" ]; then
+    "$hook"
+  fi
+}
+
+BIN_PATH=$(dirname "$(realpath "$0")")
+source "${BIN_PATH}/homelab-shell-env"
+
+run-project-hook post-up

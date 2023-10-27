@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -ex
+
+run-project-hook() {
+  local hook="script/$1"
+
+  if [ -s "$hook" ]; then
+    "$hook"
+  fi
+}
+
+BIN_PATH=$(dirname "$(realpath "$0")")
+source "${BIN_PATH}/homelab-shell-env"
+
+run-project-hook pre-pull
+docker-compose pull
+run-project-hook post-pull
+
+run-project-hook pre-build
+docker-compose build --pull
+run-project-hook post-build
+
+docker-compose stop
+run-project-hook pre-up
+exec docker-compose up

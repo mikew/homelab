@@ -1,0 +1,44 @@
+version: "2"
+
+services:
+  guacd:
+    image: guacamole/guacd:1.5.2
+    volumes:
+      - ./persistent/data:/data
+
+  guacamole:
+    image: guacamole/guacamole:1.4.0
+    networks:
+      - default
+      - reverse-proxy
+    # ports:
+    #   - 8080:8080
+    environment:
+      - GUACD_HOSTNAME=${COMPOSE_PROJECT_NAME}-guacd-1
+      - POSTGRES_HOSTNAME=${COMPOSE_PROJECT_NAME}-postgres-1
+      - POSTGRES_DATABASE=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.rule=Host(`guacamole.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.entrypoints=web,websecure
+
+      # Redirect to /guacamole because they refuse to do it themselves.
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix.redirectregex.regex=^https://guacamole.${HOMELAB_BASE_DOMAIN}/$
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix.redirectregex.replacement=https://guacamole.${HOMELAB_BASE_DOMAIN}/guacamole
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.middlewares=${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix
+
+  postgres:
+    image: postgres:9.6
+    volumes:
+      - ./persistent/db:/var/lib/postgresql/data
+      - ./data/initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_DATABASE=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+networks:
+  reverse-proxy:
+    external: true

@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -e
+
+die () {
+  echo "$1"
+  exit 1
+}
+
+[ -z "${AWS_ACCESS_KEY_ID}" ] && die "Please set 'AWS_ACCESS_KEY_ID'"
+[ -z "${AWS_SECRET_ACCESS_KEY}" ] && die "Please set 'AWS_SECRET_ACCESS_KEY'"
+[ -z "${ROUTE53_ZONEID}" ] && die "Please set 'ROUTE53_ZONEID'"
+[ -z "${ROUTE53_RECORDSET}" ] && die "Please set 'ROUTE53_RECORDSET'"
+
+AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-"us-east-1"}
+ROUTE53_TYPE=${ROUTE53_TYPE:-"A"}
+ROUTE53_TTL=${ROUTE53_TTL:-300}
+ROUTE53_COMMENT=${ROUTE53_COMMENT:-"route53-ddns"}
+CACHEFILE="/tmp/ip"
+TMPFILE="/tmp/route53_changebatch"
+
+build_changebatch () {
+  local COMMENT="${ROUTE53_COMMENT} $(date)"
+  cat > ${TMPFILE} << EOF
+  {
+    "Comment":"${COMMENT}",
+    "Changes":[
+    {
+      "Action":"UPSERT",
+      "ResourceRecordSet":{
+      "ResourceRecords":[
+      {
+        "Value":"${IP}"
+      }
+      ],
+      "Name":"${SINGLE_ROUTE53_RECORDSET}",
+      "Type":"${ROUTE53_TYPE}",
+      "TTL":${ROUTE53_TTL}
+    }
+  }
+  ]
+}
+EOF
+}
+
+change_rrsets () {
+  local recordset_array=($ROUTE53_RECORDSET)
+  for recordset in "${recordset_array[@]}"; do
+    SINGLE_ROUTE53_RECORDSET="$recordset" build_changebatch
+    aws route53 change-resource-record-sets \
+        --hosted-zone-id "${ROUTE53_ZONEID}" \
+        --change-batch file://"${TMPFILE}"
+  done
+}
+
+while true; do
+  IP=$(wget -qO- http://api.ipify.org/ || echo)
+
+  if [ -z "${IP}" ]; then
+    echo "Could not get IP"
+    continue
+  fi
+
+  touch "${CACHEFILE}"
+
+  if grep -Fxq "${IP}" "${CACHEFILE}"; then
+    echo "IP has not changed"
+  else
+    echo "Updating IP to ${IP}"
+    change_rrsets
+    echo -n "${IP}" > "${CACHEFILE}"
+  fi
+
+  sleep 1800
+  #sleep 5
+done
+

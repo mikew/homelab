@@ -1,0 +1,97 @@
+version: "2.0"
+
+services:
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    networks:
+      - default
+      - reverse-proxy
+    environment:
+      - DOWNLOAD_DIR=/storage/downloads
+      - INCOMPLETE_DIR=/storage/downloads
+      - TZ=${HOMELAB_TIMEZONE}
+      - PUID=${HOMELAB_USER_ID}
+      - PGID=${HOMELAB_GROUP_ID}
+      # To use a custom interface.
+      # - TRANSMISSION_WEB_HOME=/transmission-material-ui
+    volumes:
+      - ./persistent/transmission/config:/config
+      - ${HOMELAB_STORAGE_PATH}:/storage
+      # - ./transmission-material-ui:/transmission-material-ui
+    ports:
+      - 51413:51413
+      - 51413:51413/udp
+      # Enable this if you need access via localip:port
+      # - 9091:9091
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.rule=Host(`torrents.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.entrypoints=web,websecure
+
+  prowlarr:
+    networks:
+      - default
+      - reverse-proxy
+    image: lscr.io/linuxserver/prowlarr:develop
+    volumes:
+      - ./persistent/prowlarr/config:/config
+    # ports:
+    #  # Enable this if you need access via localip:port
+    #  - 9696:9696
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      # Set this to the host's user and group ids to avoid file conflicts.
+      - PUID=${HOMELAB_USER_ID}
+      - PGID=${HOMELAB_GROUP_ID}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-prowlarr.rule=Host(`torrentsearch.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-prowlarr.entrypoints=web,websecure
+
+  sonarr:
+    networks:
+      - default
+      - reverse-proxy
+      - home-theatre
+    image: lscr.io/linuxserver/sonarr:develop
+    # ports:
+    #  # Enable this if you need access via localip:port
+    #  - 8989:8989
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      - PUID=${HOMELAB_USER_ID}
+      - PGID=${HOMELAB_GROUP_ID}
+    volumes:
+      - ./persistent/sonarr/config:/config
+      - ${HOMELAB_STORAGE_PATH}:/storage
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-sonarr.rule=Host(`tvdvr.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-sonarr.entrypoints=web,websecure
+
+  radarr:
+    networks:
+      - default
+      - reverse-proxy
+      - home-theatre
+    image: lscr.io/linuxserver/radarr:develop
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      - PUID=${HOMELAB_USER_ID}
+      - PGID=${HOMELAB_GROUP_ID}
+    #ports:
+    #  # Enable this if you need access via localip:port
+    #  - 7878:7878
+    volumes:
+      - ./persistent/radarr/config:/config
+      - ${HOMELAB_STORAGE_PATH}:/storage
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-radarr.rule=Host(`moviedvr.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-radarr.entrypoints=web,websecure
+
+networks:
+  home-theatre:
+    external: true
+  reverse-proxy:
+    external: true

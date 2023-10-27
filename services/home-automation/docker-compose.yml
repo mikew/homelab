@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant
+    volumes:
+      - ./persistent/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    privileged: true
+    network_mode: host
+    ports:
+      - 8123:8123
+    environment:
+      # These are passed along and referenced in configuration.yaml
+      - EXTERNAL_URL=https://home.${HOMELAB_BASE_DOMAIN}
+      - INTERNAL_URL=http://${HOMELAB_HOST_LOCAL_IP}:8123
+      - HOMELAB_LAN_CIDR
+      - TZ=${HOMELAB_TIMEZONE}
+
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    volumes:
+      - ./persistent/mosquitto:/mosquitto
+    ports:
+      - 1883:1883
+    command: mosquitto -c /mosquitto-no-auth.conf
+
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt
+    volumes:
+      - ./persistent/zigbee2mqtt:/app/data
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+    devices:
+      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_f059ea6e3f98ec11b611a3d044d80d13-if00-port0:/dev/ttyUSB0

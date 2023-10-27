@@ -1,0 +1,8 @@
+http:
+  middlewares:
+    standard:
+      chain:
+        middlewares:
+          - compress@file
+          - hsts@file
+

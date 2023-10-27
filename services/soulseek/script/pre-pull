@@ -1,0 +1,2 @@
+mkdir -p ./persistent/slskd/
+chown -R "$HOMELAB_USER_ID:$HOMELAB_GROUP_ID" ./persistent

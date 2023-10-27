@@ -1,0 +1,16 @@
+http:
+  routers:
+    home-assistant:
+      service: home-assistant
+      rule: Host(`home.{{ env "HOMELAB_BASE_DOMAIN" }}`)
+      middlewares:
+        - standard@file
+      entrypoints:
+        - web
+        - websecure
+
+  services:
+    home-assistant:
+      loadbalancer:
+        servers:
+          - url: http://{{ env "HOMELAB_HOST_LOCAL_IP" }}:8123

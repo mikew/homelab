@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Update Services
+Comment=
+Exec=sudo /opt/homelab/ui/update-services
+Icon=system-software-update
+Terminal=true
+Type=Application

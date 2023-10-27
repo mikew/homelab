@@ -1,0 +1,27 @@
+version: "2"
+
+services:
+  main:
+    image: dperson/samba
+    command:
+      # Add shares with:
+      # - -s
+      # - name;/path[;browse;readonly;guest;users;admins;writelist;comment]
+      - -s
+      - Guest;/storage;yes;yes;yes;all;homelab;homelab
+      - -s
+      - Admin;/storage;yes;no;no;homelab;homelab;homelab
+    env_file: env
+    # These are required by the image, kind of a smell tbh.
+    stdin_open: true
+    tty: true
+    volumes:
+      - ${HOMELAB_STORAGE_PATH}:/storage
+    ports:
+      - 139:139
+      - 445:445
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      # Set this to the host's user and group ids to avoid file conflicts.
+      - USERID=${HOMELAB_USER_ID}
+      - GROUPID=${HOMELAB_GROUP_ID}

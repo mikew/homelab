@@ -1,0 +1,16 @@
+version: "2"
+
+services:
+  tailscale:
+    image: tailscale/tailscale
+    env_file: env
+    environment:
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_ROUTES=${HOMELAB_LAN_CIDR}
+    volumes:
+      - ./persistent/tailscale:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW

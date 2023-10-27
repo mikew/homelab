@@ -1,0 +1,53 @@
+version: '2'
+
+services:
+  plex:
+    image: plexinc/pms-docker
+    networks:
+      - home-theatre
+      - reverse-proxy
+    ports:
+      # Main Plex port
+      # You can disable this if you don't need to access via localip:port
+      - 32400:32400/tcp
+
+      # Plex DLNA Server
+      # - 1900:1900/udp
+      # - 32469:32469/tcp
+
+      # Plex Companion
+      - 3005:3005/tcp
+
+      # Plex for Roku
+      - 8324:8324/tcp
+
+      # GDM / network discovery
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+    env_file: env
+    environment:
+      # Change to your timezone
+      # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      - TZ=${HOMELAB_TIMEZONE}
+      # Allow computers on your local network to connect
+      - ALLOWED_NETWORKS=${HOMELAB_LAN_CIDR},${HOMELAB_LAN_CIDR_FALLBACK}
+      # This needs to be the IP of your host machine
+      - ADVERTISE_IP=http://${HOMELAB_HOST_LOCAL_IP}:32400/
+    volumes:
+      - ./persistent/config:/config
+      - ./persistent/transcode:/transcode
+      - ${HOMELAB_STORAGE_PATH}:/storage
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-plex.rule=Host(`home-theare.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-plex.entrypoints=web,websecure
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-plex.loadbalancer.server.port=32400
+
+networks:
+  home-theatre:
+    name: home-theatre
+  reverse-proxy:
+    external: true
+

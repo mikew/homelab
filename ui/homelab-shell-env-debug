@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+BIN_PATH="$(dirname "$(realpath "$0")")/../bin"
+source "${BIN_PATH}/homelab-shell-env"
+
+env | sort | grep ^HOMELAB
+
+echo "Press Enter to close this window ..."
+read

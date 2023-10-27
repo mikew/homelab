@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  soulseek:
+    image: slskd/slskd
+    networks:
+      - default
+      - reverse-proxy
+    user: ${HOMELAB_USER_ID}:${HOMELAB_GROUP_ID}
+    env_file: env
+    environment:
+      - SLSKD_REMOTE_CONFIGURATION=true
+      - SLSKD_DOWNLOADS_DIR=/storage/downloads
+      - SLSKD_INCOMPLETE_DIR=/storage/downloads
+      - SLSKD_SHARED_DIR=/storage/downloads
+      - SLSKD_SHARE_CACHE_STORAGE_MODE=disk
+      - SLSKD_NO_HTTPS=true
+    ports:
+      - 50300:50300
+    volumes:
+      - ./persistent/slskd:/app
+      - ${HOMELAB_STORAGE_PATH}:/storage
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-soulseek.rule=Host(`soulseek.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-soulseek.entrypoints=web,websecure
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-soulseek.loadbalancer.server.port=5030
+
+networks:
+  reverse-proxy:
+    external: true

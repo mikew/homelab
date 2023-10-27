@@ -1,0 +1,6 @@
+version: "2"
+
+services:
+  main:
+    image: alpine
+    command: "/bin/sh -c 'while true; do sleep 600; done'"

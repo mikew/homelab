@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -ex
+
+handle-exit () {
+  if [ -n "$XVNC_PID" ]; then
+    kill "$XVNC_PID"
+  fi
+
+  if [ -n "$SESSION_PID" ]; then
+    kill "$SESSION_PID"
+  fi
+}
+
+trap handle-exit EXIT
+
+export DISPLAY=:1
+
+Xvnc "$DISPLAY" -passwordfile ~/.vnc/passwd &
+XVNC_PID=$!
+
+startplasma-x11 &
+SESSION_PID=$!
+
+wait

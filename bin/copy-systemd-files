@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+main() {
+  BIN_PATH=$(dirname "$(realpath "$0")")
+  source "${BIN_PATH}/homelab-shell-env"
+
+  find services/ -maxdepth 2 -type d -name systemd | while read dir; do
+    find "$dir" -type f -iname '*.service' | while read file; do
+      SERVICE_FILE=$(realpath "$file")
+      SERVICE_DIR=$(dirname "$(dirname "$SERVICE_FILE")")
+      SERVICE_DIR_NAME=$(basename "$SERVICE_DIR")
+      SERVICE_NAME=$(basename "$SERVICE_FILE")
+      if [ "$SERVICE_NAME" = "systemd.service" ]; then
+        SERVICE_NAME="homelab.$SERVICE_DIR_NAME.service"
+      fi
+
+      echo "Working on $SERVICE_NAME ..."
+
+      SERVICE_FILE="$SERVICE_FILE" \
+      SERVICE_DIR="$SERVICE_DIR" \
+      POST_START_SCRIPT_PATH="$HOMELAB_ROOT/bin/docker-compose-post-up" \
+      START_SCRIPT_PATH="$HOMELAB_ROOT/bin/docker-compose-up" \
+        gen-service-file | sudo tee "/etc/systemd/system/$SERVICE_NAME" > /dev/null
+
+      sudo systemctl daemon-reload
+      sudo systemctl enable "$SERVICE_NAME"
+    done
+  done
+}
+
+gen-service-file() {
+  cat "$SERVICE_FILE"
+
+  echo "
+After=docker.service
+Requires=docker.service
+  "
+
+  if [ "$HOMELAB_USE_NETWORKMANAGER" = "yes" ]; then
+    echo "
+After=NetworkManager-wait-online.service
+Requires=NetworkManager-wait-online.service
+    "
+  fi
+
+  echo "
+[Service]
+WorkingDirectory=$SERVICE_DIR
+ExecStart=$START_SCRIPT_PATH
+ExecStartPost=$POST_START_SCRIPT_PATH
+TimeoutStartSec=0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+  "
+}
+
+main "$@"

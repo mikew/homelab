@@ -1,0 +1,42 @@
+version: "2.0"
+
+services:
+  db:
+    image: postgres:alpine
+    volumes:
+      - ./persistent/db:/var/lib/postgresql/data
+    env_file:
+      - env
+
+  redis:
+    image: redis:alpine
+
+  app:
+    image: nextcloud:apache
+    networks:
+      - default
+      - reverse-proxy
+    volumes:
+      - ./persistent/cloud-nextcloud:/var/www/html
+      - ${HOMELAB_STORAGE_PATH}/../cloud:/var/www/html/data
+      - ${HOMELAB_STORAGE_PATH}:/storage
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`cloud.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=web,websecure
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=80
+
+  cron:
+    image: nextcloud:apache
+    volumes:
+      - ./persistent/cloud-nextcloud:/var/www/html
+    entrypoint: /cron.sh
+
+networks:
+  reverse-proxy:
+    external: true

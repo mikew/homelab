@@ -1,0 +1,87 @@
+version: "2"
+
+services:
+  server:
+    image: gitea/gitea
+    networks:
+      - default
+      - reverse-proxy
+    environment:
+      - USER_UID=${HOMELAB_USER_ID}
+      - USER_GID=${HOMELAB_GROUP_ID}
+
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=${COMPOSE_PROJECT_NAME}-db-1:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - GITEA__database__PASSWD=gitea
+
+      - GITEA__server__DOMAIN=git.${HOMELAB_BASE_DOMAIN}
+      - GITEA__server__ROOT_URL=https://git.${HOMELAB_BASE_DOMAIN}
+      - GITEA__server__SSH_DOMAIN=git.${HOMELAB_BASE_DOMAIN}
+      # Because we're already using an HTTPS reverse proxy.
+      - GITEA__server__PROTOCOL=http
+
+      # Users will be manually created.
+      - GITEA__service__ALLOW_ONLY_INTERNAL_REGISTRATION=true
+      - GITEA__service__DISABLE_REGISTRATION=true
+      - GITEA__service__SHOW_REGISTRATION_BUTTON=false
+      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
+
+      - GITEA__DEFAULT__APP_NAME=git.${HOMELAB_BASE_DOMAIN}
+      - GITEA__service__REQUIRE_SIGNIN_VIEW=true
+
+      # Indexing
+      - GITEA__indexer__ISSUE_INDEXER_TYPE=bleve
+      # - GITEA__indexer__ISSUE_INDEXER_CONN_STR=http://${COMPOSE_PROJECT_NAME}-elasticsearch-1:9200
+
+      - GITEA__indexer__REPO_INDEXER_ENABLED=true
+      - GITEA__indexer__REPO_INDEXER_TYPE=bleve
+      - GITEA__indexer__REPO_INDEXER_REPO_TYPES=sources,forks,mirrors,templates
+      # - GITEA__indexer__REPO_INDEXER_CONN_STR=http://${COMPOSE_PROJECT_NAME}-elasticsearch-1:9200
+
+      # redis
+      - GITEA__cache__ENABLED=true
+      - GITEA__cache__ADAPTER=redis
+      - GITEA__cache__HOST=redis://${COMPOSE_PROJECT_NAME}-redis-1:6379/0
+      - GITEA__session__PROVIDER=redis
+      - GITEA__session__PROVIDER_CONFIG=redis://${COMPOSE_PROJECT_NAME}-redis-1:6379/0
+      - GITEA__queue__TYPE=redis
+      - GITEA__queue__CONN_STR=redis://${COMPOSE_PROJECT_NAME}-redis-1:6379/0
+
+      # Actions
+      - GITEA__actions__ENABLED=true
+
+    volumes:
+      - ./persistent/gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+    # TODO Investigate
+    # depends_on:
+    #   gitea-mariadb:
+    #     condition: service_healthy
+    #   gitea-redis:
+    #     condition: service_healthy
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-server.rule=Host(`git.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-server.entrypoints=web,websecure
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-server.loadbalancer.server.port=3000
+
+  db:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    volumes:
+      - ./persistent/gitea-postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+
+networks:
+  reverse-proxy:
+    external: true

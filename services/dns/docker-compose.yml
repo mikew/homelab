@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  pihole:
+    image: pihole/pihole
+    # For DHCP it is recommended to remove these ports and instead add:
+    # network_mode: "host"
+    networks:
+      - dns
+      - reverse-proxy
+    ports:
+      # TODO Re-enable when systemd-resolve issues are sorted.
+      # https://web.archive.org/web/20220612212822/https://www.bklynit.net/ubuntu-20-04-lts-docker-pihole/#step-5-stop-systemd-resolve-from-listening-on-port-53
+      - "53:53/tcp"
+      - "53:53/udp"
+      # Only required if you are using Pi-hole as your DHCP server
+      #- "67:67/udp"
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      - PIHOLE_UID=${HOMELAB_USER_ID}
+      - PIHOLE_GID=${HOMELAB_GROUP_ID}
+      #- WEBPASSWORD=set a secure password here or it will be random
+    volumes:
+      - ./persistent/pihole:/etc/pihole
+      - ./persistent/dnsmasq.d:/etc/dnsmasq.d
+    # https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+    #cap_add:
+    #  # Required if you are using Pi-hole as your DHCP server, else not needed
+    #  - NET_ADMIN
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pihole.rule=Host(`dns.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pihole.entrypoints=web,websecure
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-pihole.loadbalancer.server.port=80
+
+      # Redirect to /admin because they refuse to do it themselves.
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix.redirectregex.regex=^https://dns.${HOMELAB_BASE_DOMAIN}/$
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix.redirectregex.replacement=https://dns.${HOMELAB_BASE_DOMAIN}/admin
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pihole.middlewares=${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix
+
+networks:
+  dns:
+    name: dns
+  reverse-proxy:
+    external: true

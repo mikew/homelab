@@ -1,0 +1,18 @@
+version: "2"
+
+services:
+  trilium:
+    image: zadam/trilium
+    networks:
+      - default
+      - reverse-proxy
+    volumes:
+      - ./persistent/trilium:/home/node/trilium-data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-trilium.rule=Host(`notes.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-trilium.entrypoints=web,websecure
+
+networks:
+  reverse-proxy:
+    external: true

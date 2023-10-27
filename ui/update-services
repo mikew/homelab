@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+
+SERVICES=(
+  'homelab.*'
+)
+
+echo "Restarting services ..."
+systemctl restart "${SERVICES[@]}"
+
+systemctl status --no-pager --full --lines 0 "${SERVICES[@]}"
+
+echo "Press Enter to close this window ..."
+read

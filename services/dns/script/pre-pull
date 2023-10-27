@@ -2,4 +2,3 @@
 
 mkdir -p ./persistent/dnsmasq.d/
 echo "address=/${HOMELAB_BASE_DOMAIN}/${HOMELAB_HOST_LOCAL_IP}" > ./persistent/dnsmasq.d/03-homelab.conf
-

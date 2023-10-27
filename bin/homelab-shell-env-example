@@ -42,7 +42,7 @@ export HOMELAB_LAN_CIDR_FALLBACK
 if [ -f /etc/timezone ]; then
   HOMELAB_TIMEZONE=$(cat /etc/timezone)
 else
-  eval $(timedatectl show | grep ^Timezone)
-  HOMELAB_TIMEZONE="$Timezone"
+  TIMEZONE_OUTPUT=$(timedatectl show | grep ^Timezone)
+  HOMELAB_TIMEZONE="${TIMEZONE_OUTPUT/Timezone=/}"
 fi
 export HOMELAB_TIMEZONE

@@ -4,8 +4,8 @@ main() {
   BIN_PATH=$(dirname "$(realpath "$0")")
   source "${BIN_PATH}/homelab-shell-env"
 
-  find services/ -maxdepth 2 -type d -name systemd | while read dir; do
-    find "$dir" -type f -iname '*.service' | while read file; do
+  find services/ -maxdepth 2 -type d -name systemd | while read -r dir; do
+    find "$dir" -type f -iname '*.service' | while read -r file; do
       SERVICE_FILE=$(realpath "$file")
       SERVICE_DIR=$(dirname "$(dirname "$SERVICE_FILE")")
       SERVICE_DIR_NAME=$(basename "$SERVICE_DIR")

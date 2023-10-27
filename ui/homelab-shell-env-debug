@@ -6,5 +6,4 @@ source "${BIN_PATH}/homelab-shell-env"
 
 env | sort | grep ^HOMELAB
 
-echo "Press Enter to close this window ..."
-read
+read -n 1 -r -s -p "Press any key to close this window ..."

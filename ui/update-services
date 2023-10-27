@@ -10,5 +10,4 @@ systemctl restart "${SERVICES[@]}"
 
 systemctl status --no-pager --full --lines 0 "${SERVICES[@]}"
 
-echo "Press Enter to close this window ..."
-read
+read -n 1 -r -s -p "Press any key to close this window ..."

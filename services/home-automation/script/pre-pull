@@ -1,8 +1,12 @@
+#!/usr/bin/env bash
+set -ex
+
+cat > ../reverse-proxy/data/automatic.service.home-automation.yml <<-EOF
 http:
   routers:
     home-assistant:
       service: home-assistant
-      rule: Host(`home.{{ env "HOMELAB_BASE_DOMAIN" }}`)
+      rule: Host(\`home.$HOMELAB_BASE_DOMAIN\`)
       middlewares:
         - standard@file
       entrypoints:
@@ -13,4 +17,6 @@ http:
     home-assistant:
       loadbalancer:
         servers:
-          - url: http://{{ env "HOMELAB_HOST_LOCAL_IP" }}:8123
+          - url: http://$HOMELAB_HOST_LOCAL_IP:8123
+EOF
+

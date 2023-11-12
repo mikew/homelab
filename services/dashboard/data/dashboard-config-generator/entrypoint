@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -ex
+
+exec docker-gen \
+    -watch \
+    -notify /app/update-config.js \
+    /app/spec.tmpl /app/spec.js

@@ -1,0 +1,23 @@
+module.exports = [
+
+{{ range $group, $containers := groupByLabel $ "dashboard.group" }}
+{
+  name: "{{ $group }}",
+  items: [
+{{ range $container := $containers }}
+    {
+      name: "{{ index $container.Labels "dashboard.name" }}",
+      subtitle: "{{ index $container.Labels "dashboard.subtitle" }}",
+      url: "{{ index $container.Labels "dashboard.url" }}",
+      keywords: "{{ index $container.Labels "dashboard.keywords" }}",
+      tag: "{{ index $container.Labels "dashboard.tag" }}",
+      target: "{{ index $container.Labels "dashboard.target" }}",
+      icon: "{{ index $container.Labels "dashboard.icon" }}",
+      logo: "{{ index $container.Labels "dashboard.logo" }}",
+    },
+{{ end }}
+  ],
+},
+
+{{ end }}
+]

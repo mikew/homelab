@@ -16,6 +16,16 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-homer.rule=Host(`dashboard.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-homer.entrypoints=web,websecure
 
+  dashboard-config-generator:
+    build: .
+    #user: ${HOMELAB_USER_ID}:${HOMELAB_GROUP_ID}
+    environment:
+      - HOMELAB_HOST_NAME
+    volumes:
+      - ./data/dashboard-config-generator:/app
+      - ./persistent/homer:/output
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
 networks:
   reverse-proxy:
     external: true

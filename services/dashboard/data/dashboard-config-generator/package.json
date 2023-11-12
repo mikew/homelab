@@ -1,0 +1,12 @@
+{
+  "name": "dashboard-config-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "update-config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "yaml": "^2.3.4"
+  }
+}

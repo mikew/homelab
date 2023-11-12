@@ -1,0 +1,21 @@
+version: "2"
+
+services:
+  homer:
+    image: b4bz/homer
+    volumes:
+      - ./persistent/homer:/www/assets
+    user: ${HOMELAB_USER_ID}:${HOMELAB_GROUP_ID}
+    environment:
+      - INIT_ASSETS=1 # default
+    networks:
+      - default
+      - reverse-proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-homer.rule=Host(`dashboard.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-homer.entrypoints=web,websecure
+
+networks:
+  reverse-proxy:
+    external: true

@@ -70,6 +70,11 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-server.entrypoints=web,websecure
       - traefik.http.services.${COMPOSE_PROJECT_NAME}-server.loadbalancer.server.port=3000
 
+      - dashboard.group=Source Code
+      - dashboard.name=Source Code
+      - dashboard.subtitle=Gitea
+      - dashboard.url=https://git.${HOMELAB_BASE_DOMAIN}
+
   db:
     image: postgres:14
     environment:

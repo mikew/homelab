@@ -16,6 +16,11 @@ services:
       - INTERNAL_URL=http://${HOMELAB_HOST_LOCAL_IP}:8123
       - HOMELAB_LAN_CIDR
       - TZ=${HOMELAB_TIMEZONE}
+    labels:
+      - dashboard.group=Home Automation
+      - dashboard.name=Home Automation
+      - dashboard.subtitle=Home Assistant
+      - dashboard.url=https://home.${HOMELAB_BASE_DOMAIN}
 
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -35,3 +40,8 @@ services:
       - TZ=${HOMELAB_TIMEZONE}
     devices:
       - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_f059ea6e3f98ec11b611a3d044d80d13-if00-port0:/dev/ttyUSB0
+    labels:
+      - dashboard.group=Home Automation
+      - dashboard.name=Zigbee Devices
+      - dashboard.subtitle=zigbee2mqtt
+      - dashboard.url=http://${HOMELAB_HOST_LOCAL_IP}:8080

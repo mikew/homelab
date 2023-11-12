@@ -38,6 +38,11 @@ services:
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix.redirectregex.replacement=https://dns.${HOMELAB_BASE_DOMAIN}/admin
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pihole.middlewares=${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix
 
+      - dashboard.group=Cloud
+      - dashboard.name=DNS
+      - dashboard.subtitle=Pi-hole
+      - dashboard.url=https://dns.${HOMELAB_BASE_DOMAIN}
+
 networks:
   dns:
     name: dns

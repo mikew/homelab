@@ -28,6 +28,11 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.rule=Host(`torrents.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.entrypoints=web,websecure
 
+      - dashboard.group=Downloads
+      - dashboard.name=Torrents
+      - dashboard.subtitle=Transmission
+      - dashboard.url=https://torrents.${HOMELAB_BASE_DOMAIN}
+
   prowlarr:
     networks:
       - default
@@ -47,6 +52,11 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-prowlarr.rule=Host(`torrentsearch.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-prowlarr.entrypoints=web,websecure
+
+      - dashboard.group=Downloads
+      - dashboard.name=Torrent Search
+      - dashboard.subtitle=Prowlarr
+      - dashboard.url=https://torrentsearch.${HOMELAB_BASE_DOMAIN}
 
   sonarr:
     networks:
@@ -69,6 +79,11 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-sonarr.rule=Host(`tvdvr.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-sonarr.entrypoints=web,websecure
 
+      - dashboard.group=Home Theatre
+      - dashboard.name=TV DVR
+      - dashboard.subtitle=Sonarr
+      - dashboard.url=https://tvdvr.${HOMELAB_BASE_DOMAIN}
+
   radarr:
     networks:
       - default
@@ -89,6 +104,11 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-radarr.rule=Host(`moviedvr.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-radarr.entrypoints=web,websecure
+
+      - dashboard.group=Home Theatre
+      - dashboard.name=Movie DVR
+      - dashboard.subtitle=Rararr
+      - dashboard.url=https://moviedvr.${HOMELAB_BASE_DOMAIN}
 
 networks:
   home-theatre:

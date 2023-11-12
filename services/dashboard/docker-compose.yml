@@ -18,13 +18,15 @@ services:
 
   dashboard-config-generator:
     build: .
-    #user: ${HOMELAB_USER_ID}:${HOMELAB_GROUP_ID}
     environment:
+      - PUID=${HOMELAB_USER_ID}
+      - PGID=${HOMELAB_GROUP_ID}
       - HOMELAB_HOST_NAME
     volumes:
-      - ./data/dashboard-config-generator:/app
       - ./persistent/homer:/output
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Helps when workong on the config generator.
+      # - ./data/dashboard-config-generator:/app
 
 networks:
   reverse-proxy:

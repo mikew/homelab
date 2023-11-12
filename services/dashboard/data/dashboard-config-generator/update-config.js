@@ -4,8 +4,10 @@ const spec = require('./spec')
 const yaml = require('yaml')
 const fs = require('fs/promises')
 
+const DASHBOARD_CONFIG = '/output/config.yml'
+
 async function main() {
-  const previousConfigStr = await fs.readFile('/output/config.yml', 'utf-8')
+  const previousConfigStr = await fs.readFile(DASHBOARD_CONFIG, 'utf-8')
   const previousConfig = yaml.parse(previousConfigStr)
   previousConfig.subtitle = process.env.HOMELAB_HOST_NAME
 
@@ -23,7 +25,8 @@ async function main() {
 
   const newConfigStr = yaml.stringify(previousConfig)
 
-  await fs.writeFile('/output/config.yml', newConfigStr, 'utf-8')
+  await fs.writeFile(DASHBOARD_CONFIG, newConfigStr, 'utf-8')
+  await fs.chown(DASHBOARD_CONFIG, Number(process.env.PUID), Number(process.env.PGID))
 }
 
 main()

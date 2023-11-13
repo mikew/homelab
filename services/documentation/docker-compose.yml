@@ -2,5 +2,22 @@ version: "2"
 
 services:
   main:
-    image: alpine
-    command: "/bin/sh -c 'while true; do sleep 600; done'"
+    image: nginx:stable-alpine
+    volumes:
+      - ./persistent:/usr/share/nginx/html
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-main.rule=Host(`user-guide.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-main.entrypoints=web,websecure
+
+      - dashboard.group=Documentation
+      - dashboard.name=User Guide
+      - dashboard.url=https://user-guide.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-circle-question
+    networks:
+      - default
+      - reverse-proxy
+
+networks:
+  reverse-proxy:
+    external: true

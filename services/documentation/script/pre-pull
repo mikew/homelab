@@ -27,6 +27,8 @@ docker run --rm \
   node /app/data/replaceEnvVars.js /app/README.md \
   > replaced.md
 
+mkdir -p persistent/
+
 # Turn the markdown into HTML.
 docker run --rm \
   --volume "$PWD":/app \
@@ -39,9 +41,9 @@ docker run --rm \
   --toc \
   --metadata "title=$TITLE" \
   --standalone \
-  > "$TITLE.html"
+  > "persistent/index.html"
 
 # Cleanup and move files
 rm combined_user_guide.md
 mv replaced.md "../../ui/$TITLE.md"
-mv "$TITLE.html" ../../ui/
+cp persistent/index.html "../../ui/$TITLE.html"

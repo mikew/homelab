@@ -49,6 +49,7 @@ services:
       - dashboard.name=Home Theatre
       - dashboard.subtitle=Plex
       - dashboard.url=https://home-theatre.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-photo-film
 
 networks:
   home-theatre:

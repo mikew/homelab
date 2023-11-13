@@ -31,6 +31,7 @@ services:
       - dashboard.name=Music
       - dashboard.subtitle=Soulseek
       - dashboard.url=https://soulseek.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-music
 
 networks:
   reverse-proxy:

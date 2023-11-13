@@ -32,6 +32,7 @@ services:
       - dashboard.name=Torrents
       - dashboard.subtitle=Transmission
       - dashboard.url=https://torrents.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-file-arrow-down
 
   prowlarr:
     networks:
@@ -57,6 +58,7 @@ services:
       - dashboard.name=Torrent Search
       - dashboard.subtitle=Prowlarr
       - dashboard.url=https://torrentsearch.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-magnifying-glass
 
   sonarr:
     networks:
@@ -83,6 +85,7 @@ services:
       - dashboard.name=TV DVR
       - dashboard.subtitle=Sonarr
       - dashboard.url=https://tvdvr.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-tv
 
   radarr:
     networks:
@@ -109,6 +112,7 @@ services:
       - dashboard.name=Movie DVR
       - dashboard.subtitle=Rararr
       - dashboard.url=https://moviedvr.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-film
 
 networks:
   home-theatre:

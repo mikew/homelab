@@ -17,6 +17,7 @@ services:
       - dashboard.name=Notes
       - dashboard.subtitle=Trilium
       - dashboard.url=https://notes.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-book
 
 networks:
   reverse-proxy:

@@ -74,6 +74,7 @@ services:
       - dashboard.name=Source Code
       - dashboard.subtitle=Gitea
       - dashboard.url=https://git.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-code
 
   db:
     image: postgres:14

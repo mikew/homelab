@@ -29,6 +29,12 @@ services:
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix.redirectregex.replacement=https://remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}/guacamole
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.middlewares=${COMPOSE_PROJECT_NAME}-guacamole-redirect-prefix
 
+      - dashboard.group=Cloud
+      - dashboard.name=Remote Desktop Gateway
+      - dashboard.subtitle=Guacamole
+      - dashboard.url=https://remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-computer
+
   postgres:
     image: postgres:9.6
     volumes:

@@ -35,6 +35,7 @@ services:
       - dashboard.name=Cloud
       - dashboard.subtitle=Nextcloud
       - dashboard.url=https://cloud.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-cloud
 
   cron:
     image: nextcloud:apache

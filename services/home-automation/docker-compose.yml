@@ -21,6 +21,7 @@ services:
       - dashboard.name=Home Automation
       - dashboard.subtitle=Home Assistant
       - dashboard.url=https://home.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-house-chimney
 
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -45,3 +46,4 @@ services:
       - dashboard.name=Zigbee Devices
       - dashboard.subtitle=zigbee2mqtt
       - dashboard.url=http://${HOMELAB_HOST_LOCAL_IP}:8080
+      - dashboard.icon=fa fa-lightbulb

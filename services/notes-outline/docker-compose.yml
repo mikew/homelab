@@ -26,6 +26,14 @@ services:
       - FILE_STORAGE_UPLOAD_MAX_SIZE=26214400
 
       - REDIS_URL=redis://redis:6379
+
+      - OIDC_AUTH_URI=https://auth.${HOMELAB_BASE_DOMAIN}/api/oidc/authorization
+      - OIDC_TOKEN_URI=https://auth.${HOMELAB_BASE_DOMAIN}/api/oidc/token
+      - OIDC_USERINFO_URI=https://auth.${HOMELAB_BASE_DOMAIN}/api/oidc/userinfo
+      - OIDC_USERNAME_CLAIM=preferred_username
+      - OIDC_GROUP_CLAIM=groups
+      - OIDC_DISPLAY_NAME=Authelia
+      - OIDC_SCOPES=openid offline_access profile email groups
     volumes:
       - ./persistent/outline:/var/lib/outline/data
       - ./data/entrypoint:/entrypoint

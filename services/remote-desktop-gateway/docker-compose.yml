@@ -22,12 +22,21 @@ services:
       # It's a change to what environment variables are accepted in docker,
       # there's no good reason to hold this back other than bad management.
       - ./start.sh:/opt/guacamole/bin/start.sh
+    env_file: env
     environment:
       - GUACD_HOSTNAME=${COMPOSE_PROJECT_NAME}-guacd-1
       - POSTGRESQL_HOSTNAME=${COMPOSE_PROJECT_NAME}-postgres-1
       - POSTGRESQL_DATABASE=postgres
       - POSTGRESQL_USER=postgres
       - POSTGRESQL_PASSWORD=postgres
+
+      - OPENID_AUTHORIZATION_ENDPOINT=https://auth.${HOMELAB_BASE_DOMAIN}/api/oidc/authorization?state=1234abcedfdhf
+      - OPENID_JWKS_ENDPOINT=https://auth.${HOMELAB_BASE_DOMAIN}/jwks.json
+      - OPENID_ISSUER=https://auth.${HOMELAB_BASE_DOMAIN}
+      - OPENID_REDIRECT_URI=https://remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}
+      - OPENID_USERNAME_CLAIM_TYPE=preferred_username
+      - OPENID_GROUPS_CLAIM_TYPE=groups
+      - OPENID_SCOPE=openid profile groups email
 
     labels:
       - traefik.enable=true

@@ -41,3 +41,22 @@ identity_providers:
       - key: |
 
     clients:
+{{- if env "OIDC_GUACAMOLE_CLIENT_ID" }}
+      - description: Apache Guacamole
+        id: ${OIDC_GUACAMOLE_CLIENT_ID}
+        secret: ${OIDC_GUACAMOLE_CLIENT_SECRET}
+
+        pre_configured_consent_duration: 100y
+        public: false
+        authorization_policy: one_factor
+        scopes:
+          - openid
+          - profile
+          - groups
+          - email
+        redirect_uris:
+          - https://remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}
+        response_types:
+          - id_token
+{{ end }}
+

@@ -1,0 +1,43 @@
+totp:
+  issuer: auth.${HOMELAB_BASE_DOMAIN}
+
+authentication_backend:
+  password_reset:
+    disable: true
+
+  file:
+    path: /config/users.yml
+
+access_control:
+  default_policy: one_factor
+  #default_policy: two_factor
+
+session:
+  inactivity: '5m'
+  expiration: '1h'
+  remember_me: '1M'
+
+  redis:
+    host: redis
+
+  cookies:
+    - domain: ${HOMELAB_BASE_DOMAIN}
+      authelia_url: https://auth.${HOMELAB_BASE_DOMAIN}
+      default_redirection_url: https://dashboard.${HOMELAB_BASE_DOMAIN}
+
+storage:
+  local:
+    path: /output/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /output/notifications
+
+identity_providers:
+  oidc:
+    hmac_secret: ${AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET}
+    issuer_private_keys:
+      # Generate with `./script/authelia-crypto pair rsa generate --bits 4096 --directory /keys && cat keys/private.pem`
+      - key: |
+
+    clients:

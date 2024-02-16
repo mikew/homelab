@@ -1,0 +1,14 @@
+users:
+  test:
+    disabled: false
+    displayname: Test User
+    email: test@example.com
+    groups:
+      - users
+      - admins
+      - developers
+    # Generate with either:
+    # - `./script/generate-hash-random`
+    # - `./script/generate-hash-password some super secure password`
+    # This is "password"
+    password: $pbkdf2-sha512$310000$dUllhDQSALqfwwNKmxqPPg$gLTDnKZnLnwUQluAg7UJlyzFcJUd16W9kgTPKMvSzXac5vYnonUlHuPFBN0M3RZ.AKA2FzvfmwxDeZP6KoN3rg

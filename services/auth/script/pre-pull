@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+mkdir -p persistent/authelia/
+
+cat > ../reverse-proxy/data/generated.middleware.auth.yml <<-EOF
+http:
+  middlewares:
+    auth:
+      forwardAuth:
+        # Using the internal container + port, with the external domain in ?rd
+        address: http://authelia:9091/api/verify?rd=https://auth.${HOMELAB_BASE_DOMAIN}/
+        trustForwardHeader: true
+        authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
+
+    auth-basic:
+      forwardAuth:
+        address: http://authelia:9091/api/verify?auth=basic
+        trustForwardHeader: true
+        authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
+EOF

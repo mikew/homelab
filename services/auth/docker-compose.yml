@@ -1,0 +1,27 @@
+services:
+  authelia:
+    image: authelia/authelia:v4.38.0-beta3
+    networks:
+      - reverse-proxy
+    volumes:
+      - ./data/configuration.yml:/config/configuration.yml
+      - ./data/users.yml:/config/users.yml
+      - ./persistent/authelia:/output
+    env_file: env
+    environment:
+      - PUID=${HOMELAB_USER_ID}
+      - PGID=${HOMELAB_GROUP_ID}
+      - TZ=${HOMELAB_TIMEZONE}
+      - X_AUTHELIA_CONFIG_FILTERS=expand-env,template
+      - HOMELAB_BASE_DOMAIN
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-authelia.rule=Host(`auth.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-authelia.entrypoints=web,websecure
+
+  redis:
+    image: redis:alpine
+
+networks:
+  reverse-proxy:
+    external: true

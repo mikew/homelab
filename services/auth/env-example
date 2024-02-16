@@ -1,0 +1,32 @@
+# Generate with `./script/generate-random --length 64`
+AUTHELIA_SESSION_SECRET=
+
+# Generate with `./script/generate-random --length 64`
+AUTHELIA_STORAGE_ENCRYPTION_KEY=
+
+# Generate with `./script/generate-random --length 64`
+AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET=
+
+# Generate with `./script/generate-oidc-client-id-and-client-secret`
+OIDC_GUACAMOLE_CLIENT_ID=
+OIDC_GUACAMOLE_CLIENT_SECRET=
+
+# Generate with `./script/generate-oidc-client-id-and-client-secret`
+OIDC_OUTLINE_CLIENT_ID=
+OIDC_OUTLINE_CLIENT_SECRET=
+
+# Generate with `./script/generate-oidc-client-id-and-client-secret`
+OIDC_GRAFANA_CLIENT_ID=
+OIDC_GRAFANA_CLIENT_SECRET=
+
+# Generate with `./script/generate-oidc-client-id-and-client-secret`
+OIDC_GITEA_CLIENT_ID=
+OIDC_GITEA_CLIENT_SECRET=
+
+# Generate with `./script/generate-oidc-client-id-and-client-secret`
+OIDC_OIDCDEBUGGER_CLIENT_ID=
+OIDC_OIDCDEBUGGER_CLIENT_SECRET=
+
+# Generate with `./script/generate-oidc-client-id-and-client-secret`
+OIDC_NEXTCLOUD_CLIENT_ID=
+OIDC_NEXTCLOUD_CLIENT_SECRET=

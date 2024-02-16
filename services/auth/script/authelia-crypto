@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+SERVICE_DIR="$(dirname "$(realpath "$0")")/../"
+
+HOMELAB_BIN_PATH="$SERVICE_DIR/../../bin"
+source "${HOMELAB_BIN_PATH}/homelab-shell-env"
+
+mkdir -p keys
+
+exec docker run \
+  --user "$HOMELAB_USER_ID:$HOMELAB_GROUP_ID" \
+  --volume "$SERVICE_DIR/keys:/keys" \
+  --rm \
+  authelia/authelia:latest \
+  authelia crypto "$@"

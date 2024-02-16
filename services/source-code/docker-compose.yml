@@ -22,13 +22,23 @@ services:
       # Because we're already using an HTTPS reverse proxy.
       - GITEA__server__PROTOCOL=http
 
-      # Users will be manually created.
-      - GITEA__service__ALLOW_ONLY_INTERNAL_REGISTRATION=true
-      - GITEA__service__DISABLE_REGISTRATION=true
-      - GITEA__service__SHOW_REGISTRATION_BUTTON=false
-      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
+      # OpenID
+      - GITEA__openid__ENABLE_OPENID_SIGNIN=true
+      - GITEA__openid__ENABLE_OPENID_SIGNUP=true
+      - GITEA__openid__WHITELISTED_URIS=auth.${HOMELAB_BASE_DOMAIN}
 
-      - GITEA__DEFAULT__APP_NAME=git.${HOMELAB_BASE_DOMAIN}
+      - GITEA__service__DISABLE_REGISTRATION=true
+      - GITEA__service__ALLOW_ONLY_INTERNAL_REGISTRATION=false
+      - GITEA__service__ALLOW_ONLY_EXTERNAL_REGISTRATION=true
+      - GITEA__service__SHOW_REGISTRATION_BUTTON=false
+
+      - GITEA__oauth2_client__REGISTER_EMAIL_CONFIRM=false
+      - GITEA__oauth2_client__ENABLE_AUTO_REGISTRATION=true
+      - GITEA__oauth2_client__ACCOUNT_LINKING=login
+      - GITEA__oauth2_client__USERNAME=preferred_username
+      - GITEA__oauth2_client__OPENID_CONNECT_SCOPES=profile email groups
+
+      - GITEA__APP_NAME=git.${HOMELAB_BASE_DOMAIN}
       - GITEA__service__REQUIRE_SIGNIN_VIEW=true
 
       # Indexing

@@ -2,46 +2,119 @@ version: "2.0"
 
 services:
   db:
-    image: postgres:alpine
+    image: nextcloud/aio-postgresql:latest
     volumes:
-      - ./persistent/db:/var/lib/postgresql/data
+      - ./persistent/db:/var/lib/postgresql/data:rw
+      - ./persistent/db-dump:/mnt/data:rw
     env_file:
       - env
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      - PGTZ=${HOMELAB_TIMEZONE}
+      - POSTGRES_DB=nextcloud_database
+      - POSTGRES_USER=nextcloud
 
   redis:
-    image: redis:alpine
+    image: nextcloud/aio-redis:latest
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+    env_file:
+      - env
+    volumes:
+      - ./persistent/redis:/data:rw
 
-  app:
-    image: nextcloud:apache
+  http:
+    image: nextcloud/aio-apache:latest
     networks:
       - default
       - reverse-proxy
-    volumes:
-      - ./persistent/cloud-nextcloud:/var/www/html
-      - ${HOMELAB_STORAGE_PATH}/../cloud:/var/www/html/data
-      - ${HOMELAB_STORAGE_PATH}:/storage
     environment:
-      - POSTGRES_HOST=db
-      - REDIS_HOST=redis
-    env_file:
-      - env
+      - TZ=${HOMELAB_TIMEZONE}
+      - NC_DOMAIN=cloud.${HOMELAB_BASE_DOMAIN}
+      - NEXTCLOUD_HOST=nextcloud
+      - APACHE_PORT=11000
+      - APACHE_MAX_SIZE=10737418240
+      - APACHE_MAX_TIME=3600
+      - COLLABORA_HOST=nextcloud-aio-collabora
+      - TALK_HOST=nextcloud-aio-talk
+      - ONLYOFFICE_HOST=nextcloud-aio-onlyoffice
+      - NOTIFY_PUSH_HOST=nextcloud-aio-notify-push
+    volumes:
+      - ./persistent/nextcloud:/var/www/html:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`cloud.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=web,websecure
-      - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=80
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=11000
 
       - dashboard.group=Cloud
       - dashboard.name=Cloud
-      - dashboard.subtitle=Nextcloud
+      - dashboard.subtitle=Nextcloud AIO
       - dashboard.url=https://cloud.${HOMELAB_BASE_DOMAIN}
       - dashboard.icon=fa fa-cloud
 
-  cron:
-    image: nextcloud:apache
+  nextcloud:
+    image: nextcloud/aio-nextcloud:latest
     volumes:
-      - ./persistent/cloud-nextcloud:/var/www/html
-    entrypoint: /cron.sh
+      - ./persistent/nextcloud:/var/www/html:rw
+      - ${HOMELAB_STORAGE_PATH}/../cloud:/mnt/ncdata:rw
+      - ${HOMELAB_STORAGE_PATH}:/storage:rw
+    env_file:
+      - env
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      - NC_DOMAIN=cloud.${HOMELAB_BASE_DOMAIN}
+      - OVERWRITEHOST=cloud.${HOMELAB_BASE_DOMAIN}
+      - ADMIN_USER=admin
+      - NEXTCLOUD_DATA_DIR=/mnt/ncdata
+      - NEXTCLOUD_MOUNT=/storage
+      - STARTUP_APPS=deck tasks calendar contacts notes user_oidc
+      - ADDITIONAL_APKS=imagemagick
+      - ADDITIONAL_PHP_EXTENSIONS=imagick
+
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=nextcloud_database
+      - POSTGRES_USER=nextcloud
+
+      - REDIS_HOST=redis
+
+      - IMAGINARY_ENABLED=yes
+      - IMAGINARY_HOST=imaginary
+      - FULLTEXTSEARCH_ENABLED=yes
+      - FULLTEXTSEARCH_HOST=elasticsearch
+
+      - APACHE_PORT=11000
+      - OVERWRITEPROTOCOL=https
+      - UPDATE_NEXTCLOUD_APPS=no
+      - REMOVE_DISABLED_APPS=yes
+      - PHP_UPLOAD_LIMIT=10G
+      - PHP_MEMORY_LIMIT=512M
+      - PHP_MAX_TIME=3600
+      - INSTALL_LATEST_MAJOR=no
+
+  imaginary:
+    image: nextcloud/aio-imaginary:latest
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+    cap_add:
+      - SYS_NICE
+
+  elasticsearch:
+    image: nextcloud/aio-fulltextsearch:latest
+    env_file:
+      - env
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      - ES_JAVA_OPTS=-Xms512M -Xmx512M
+      - bootstrap.memory_lock=true
+      - cluster.name=nextcloud-aio
+      - discovery.type=single-node
+      - logger.org.elasticsearch.discovery=WARN
+      - http.port=9200
+      - xpack.license.self_generated.type=basic
+      - xpack.security.enabled=false
+    volumes:
+      - ./persistent/elasticsearch:/usr/share/elasticsearch/data:rw
 
 networks:
   reverse-proxy:

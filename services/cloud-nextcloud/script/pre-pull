@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -ex
+
+mkdir -p ./persistent/nextcloud
+sudo chown 33:0 ./persistent/nextcloud
+
+mkdir -p ./persistent/db
+sudo chown 999:999 ./persistent/db
+
+mkdir -p ./persistent/db-dump
+sudo chown 999:999 ./persistent/db-dump
+
+mkdir -p ./persistent/elasticsearch
+sudo chown 1000 ./persistent/elasticsearch
+
+mkdir -p ./persistent/redis
+sudo chown 999:1000 ./persistent/redis

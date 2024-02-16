@@ -2,6 +2,7 @@ services:
   authelia:
     image: authelia/authelia:v4.38.0-beta3
     networks:
+      - default
       - reverse-proxy
     volumes:
       - ./data/configuration.yml:/config/configuration.yml

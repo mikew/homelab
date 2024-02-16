@@ -2,7 +2,7 @@ version: "2.0"
 
 services:
   transmission:
-    image: lscr.io/linuxserver/transmission:latest
+    image: linuxserver/transmission:latest
     networks:
       - default
       - reverse-proxy
@@ -38,7 +38,7 @@ services:
     networks:
       - default
       - reverse-proxy
-    image: lscr.io/linuxserver/prowlarr:develop
+    image: linuxserver/prowlarr:develop
     volumes:
       - ./persistent/prowlarr/config:/config
     # ports:
@@ -65,7 +65,7 @@ services:
       - default
       - reverse-proxy
       - home-theatre
-    image: lscr.io/linuxserver/sonarr:develop
+    image: linuxserver/sonarr:develop
     # ports:
     #  # Enable this if you need access via localip:port
     #  - 8989:8989
@@ -92,7 +92,7 @@ services:
       - default
       - reverse-proxy
       - home-theatre
-    image: lscr.io/linuxserver/radarr:develop
+    image: linuxserver/radarr:develop
     environment:
       - TZ=${HOMELAB_TIMEZONE}
       - PUID=${HOMELAB_USER_ID}

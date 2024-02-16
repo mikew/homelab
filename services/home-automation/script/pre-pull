@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-cat > ../reverse-proxy/data/automatic.service.home-automation.yml <<-EOF
+cat > ../reverse-proxy/data/generated.service.home-automation.yml <<-EOF
 http:
   routers:
     home-assistant:

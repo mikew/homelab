@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+  outline:
+    image: outlinewiki/outline:latest
+    env_file: env
+
+    # Hack to get outline to just set the right permissions for its data
+    # directory on startup.
+    user: root
+    entrypoint: /entrypoint
+
+    networks:
+      - default
+      - reverse-proxy
+    environment:
+      - URL=https://notes.${HOMELAB_BASE_DOMAIN}
+      - PORT=3000
+      - FORCE_HTTPS=false
+      - DEFAULT_LANGUAGE=en_US
+      - ENABLE_UPDATES=true
+      - WEB_CONCURRENCY=4
+      - MAXIMUM_IMPORT_SIZE=5120000
+
+      - FILE_STORAGE=local
+      - FILE_STORAGE_UPLOAD_MAX_SIZE=26214400
+
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./persistent/outline:/var/lib/outline/data
+      - ./data/entrypoint:/entrypoint
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-outline.rule=Host(`notes.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-outline.entrypoints=web,websecure
+
+      - dashboard.group=Cloud
+      - dashboard.name=Notes
+      - dashboard.subtitle=Outline
+      - dashboard.url=https://notes.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-book
+
+  redis:
+    image: redis:7.2-alpine
+    env_file: env
+    volumes:
+      - ./persistent/redis:/data
+
+  postgres:
+    image: postgres:16.1-alpine
+    env_file: env
+    volumes:
+      - ./persistent/db:/var/lib/postgresql/data
+
+networks:
+  reverse-proxy:
+    external: true

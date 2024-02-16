@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -e
+
+mkdir -p "$FILE_STORAGE_LOCAL_ROOT_DIR"
+chown -R nodejs:nodejs "$FILE_STORAGE_LOCAL_ROOT_DIR"
+chmod 1777 "$FILE_STORAGE_LOCAL_ROOT_DIR"
+
+if [ -z "$1" ]; then
+  su -s /bin/sh -c "yarn start" nodejs
+else
+  su -s /bin/sh -c "$*" nodejs
+fi

@@ -78,6 +78,24 @@ identity_providers:
           - groups
 {{ end }}
 
+{{- if env "OIDC_GRAFANA_CLIENT_ID" }}
+      - description: Grafana
+        id: ${OIDC_GRAFANA_CLIENT_ID}
+        secret: ${OIDC_GRAFANA_CLIENT_SECRET}
+
+        pre_configured_consent_duration: 100y
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://monitoring.${HOMELAB_BASE_DOMAIN}/login/generic_oauth
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+          - offline_access
+{{ end }}
+
 {{- if env "OIDC_GITEA_CLIENT_ID" }}
       - description: Gitea
         id: ${OIDC_GITEA_CLIENT_ID}

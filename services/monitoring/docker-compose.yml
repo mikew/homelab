@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    networks:
+      - default
+      - reverse-proxy
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    command:
+      - --housekeeping_interval=15s
+      - --docker_only=true
+      - --disable_metrics=advtcp,disk,diskIO,hugetlb,process,psi_avg,psi_total,resctrl,sched,tcp,udp
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-cadvisor.rule=Host(`cadvisor.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-cadvisor.entrypoints=web,websecure
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    command:
+      - --path.rootfs=/host
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+    privileged: true
+    network_mode: host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./persistent/prometheus:/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    networks:
+      - default
+      - reverse-proxy
+    volumes:
+      - ./persistent/grafana:/var/lib/grafana
+    env_file: env
+    environment:
+      - GF_SERVER_DOMAIN=monitoring.${HOMELAB_BASE_DOMAIN}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTANCE_NAME=${HOMELAB_BASE_DOMAIN}
+      - GF_SERVER_ENABLE_GZIP=true
+
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp.gmail.com:587
+      - GF_SMTP_FROM_ADDRESS=wyatt.mike@gmail.com
+      - GF_SMTP_USER=wyatt.mike@gmail.com
+
+      - GF_SERVER_ROOT_URL=https://monitoring.${HOMELAB_BASE_DOMAIN}
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_NAME=Authelia
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email groups offline_access
+      - GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES=false
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://auth.${HOMELAB_BASE_DOMAIN}/api/oidc/authorization
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://auth.${HOMELAB_BASE_DOMAIN}/api/oidc/token
+      - GF_AUTH_GENERIC_OAUTH_API_URL=https://auth.${HOMELAB_BASE_DOMAIN}/api/oidc/userinfo
+      - GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH=preferred_username
+      - GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH=groups
+      - GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH=name
+      - GF_AUTH_GENERIC_OAUTH_USE_PKCE=true
+      - GF_AUTH_GENERIC_OAUTH_USE_REFRESH_TOKEN=true
+      - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(groups[*], 'admins') && 'Admin' || contains(groups[*], 'developers') && 'Editor' || 'Viewer'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-grafana.rule=Host(`monitoring.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-grafana.entrypoints=web,websecure
+
+networks:
+  reverse-proxy:
+    external: true

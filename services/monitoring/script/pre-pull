@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+cat data/prometheus/prometheus-template.yml | docker run --rm -i \
+  --env HOMELAB_HOST_LOCAL_IP \
+  --env HOMELAB_HOST_NAME \
+  hairyhenderson/gomplate \
+  > data/prometheus/prometheus.yml
+
+cat <<-EOF | docker run --rm -i --volume "$PWD:/data" alpine sh
+# https://grafana.com/docs/grafana/latest/installation/docker/#user-id-changes
+mkdir -p /data/persistent/grafana/
+chown 472:1 /data/persistent/grafana/
+
+# https://stackoverflow.com/a/50009322
+mkdir -p /data/persistent/prometheus/
+chown 65534:65534 /data/persistent/prometheus/
+EOF

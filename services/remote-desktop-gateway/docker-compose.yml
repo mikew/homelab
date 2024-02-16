@@ -24,8 +24,8 @@ services:
       - ./start.sh:/opt/guacamole/bin/start.sh
     env_file: env
     environment:
-      - GUACD_HOSTNAME=${COMPOSE_PROJECT_NAME}-guacd-1
-      - POSTGRESQL_HOSTNAME=${COMPOSE_PROJECT_NAME}-postgres-1
+      - GUACD_HOSTNAME=guacd
+      - POSTGRESQL_HOSTNAME=postgres
       - POSTGRESQL_DATABASE=postgres
       - POSTGRESQL_USER=postgres
       - POSTGRESQL_PASSWORD=postgres

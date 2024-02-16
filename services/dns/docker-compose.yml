@@ -42,6 +42,7 @@ services:
       - dashboard.name=DNS
       - dashboard.subtitle=Pi-hole
       - dashboard.url=https://dns.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-network-wired
 
 networks:
   dns:

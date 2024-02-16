@@ -2,23 +2,33 @@ version: "2"
 
 services:
   guacd:
-    image: guacamole/guacd:1.5.2
+    image: guacamole/guacd:1.5.4
     volumes:
       - ./persistent/data:/data
 
   guacamole:
-    image: guacamole/guacamole:1.4.0
+    image: guacamole/guacamole:1.5.4
     networks:
       - default
       - reverse-proxy
-    # ports:
-    #   - 8080:8080
+    volumes:
+      # I've heard Apache was bad at managing software, but oh my.
+      # The backing functionality for getting groups from OpenID was added in
+      # 2020: https://github.com/apache/guacamole-client/pull/564
+      # ... and released in 2021 (1.3.0)
+      # The PR adding support for `OPENID_SCOPE` was added in 2023:
+      # https://github.com/apache/guacamole-client/commit/c9a7c7bae4a8e517b62c783dfccba11f8ca7c43e
+      # ... but for some reason is slated for 1.6.0
+      # It's a change to what environment variables are accepted in docker,
+      # there's no good reason to hold this back other than bad management.
+      - ./start.sh:/opt/guacamole/bin/start.sh
     environment:
       - GUACD_HOSTNAME=${COMPOSE_PROJECT_NAME}-guacd-1
-      - POSTGRES_HOSTNAME=${COMPOSE_PROJECT_NAME}-postgres-1
-      - POSTGRES_DATABASE=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRESQL_HOSTNAME=${COMPOSE_PROJECT_NAME}-postgres-1
+      - POSTGRESQL_DATABASE=postgres
+      - POSTGRESQL_USER=postgres
+      - POSTGRESQL_PASSWORD=postgres
+
     labels:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-guacamole.rule=Host(`remote-desktop-gateway.${HOMELAB_BASE_DOMAIN}`)

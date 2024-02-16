@@ -9,32 +9,27 @@ source "${BIN_PATH}/homelab-shell-env"
 # Generate a docker env file that has all the homelab vars.
 env | sort | grep ^HOMELAB > homelab-env
 
+# Generate a combined_user_guide.md file and collect all files named
+# USER_GUIDE.md
 echo > combined_user_guide.md
-
 find ../ -maxdepth 2 -name USER_GUIDE.md | sort | while read -r file; do
   cat "$file" >> combined_user_guide.md
   echo >> combined_user_guide.md
   echo >> combined_user_guide.md
 done
 
-# Replace env vars.
-docker run --rm \
-  --volume "$PWD:/app" \
+cat README.md | docker run --rm -i \
   --env-file homelab-env \
   --env "HOMELAB_USER_GUIDES=$(cat combined_user_guide.md)" \
-  --user "$HOMELAB_USER_ID:$HOMELAB_GROUP_ID" \
-  node:lts-alpine \
-  node /app/data/replaceEnvVars.js /app/README.md \
+  hairyhenderson/gomplate \
   > replaced.md
 
 mkdir -p persistent/
 
 # Turn the markdown into HTML.
-docker run --rm \
+cat replaced.md | docker run --rm -i \
   --volume "$PWD":/app \
-  --user "$HOMELAB_USER_ID:$HOMELAB_GROUP_ID" \
   pandoc/core \
-  /app/replaced.md \
   --from markdown+autolink_bare_uris \
   --to html5 \
   --include-in-header /app/gh-pandoc.css \

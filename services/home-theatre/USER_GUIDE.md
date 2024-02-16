@@ -2,8 +2,8 @@
 
 Powered by [Plex](https://plex.tv)
 
-- External Access: https://home-theatre.{{HOMELAB_BASE_DOMAIN}}
-- Local Access: http://{{HOMELAB_HOST_LOCAL_IP}}:32400
+- External Access: https://home-theatre.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Local Access: http://{{env.Getenv "HOMELAB_HOST_LOCAL_IP"}}:32400
 
 This will organize all your movies, TV shows, and music, and make the available on any device, anywhere in the world.
 

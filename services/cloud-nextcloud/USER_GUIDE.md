@@ -2,7 +2,7 @@
 
 Powered by [Nextcloud](https://nextcloud.com)
 
-- External Access: https://cloud.{{HOMELAB_BASE_DOMAIN}}
+- External Access: https://cloud.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
 
 This gives you access to all of your files and photos. You can also add things like:
 

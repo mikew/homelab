@@ -2,8 +2,8 @@
 
 Powered by [Home Assistant](https://www.home-assistant.io)
 
-- External Access: https://home.{{HOMELAB_BASE_DOMAIN}}
-- Local Access: http://{{HOMELAB_HOST_LOCAL_IP}}:8123
+- External Access: https://home.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Local Access: http://{{env.Getenv "HOMELAB_HOST_LOCAL_IP"}}:8123
 
 This can do a lot.
 

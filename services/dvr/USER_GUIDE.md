@@ -2,8 +2,8 @@
 
 Powered by [Radarr][radarr-docs]
 
-- External Access: https://moviedvr.{{HOMELAB_BASE_DOMAIN}}
-- Local Access: http://{{HOMELAB_HOST_LOCAL_IP}}:7878
+- External Access: https://moviedvr.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Local Access: http://{{env.Getenv "HOMELAB_HOST_LOCAL_IP"}}:7878
 
 The idea behind this is you search for a movie, select the desired quality, and that's it. Radarr will periodically search for any missing movies and download them.
 
@@ -17,8 +17,8 @@ Once a download is complete, Radarr will move and rename the files for you, and 
 
 Powered by [Sonarr][sonarr-docs]
 
-- External Access: https://tvdvr.{{HOMELAB_BASE_DOMAIN}}
-- Local Access: http://{{HOMELAB_HOST_LOCAL_IP}}:8989
+- External Access: https://tvdvr.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Local Access: http://{{env.Getenv "HOMELAB_HOST_LOCAL_IP"}}:8989
 
 The idea behind this is you add a movie to a list, select the desired quality, and that's it. Sonarr will periodically search for any missing episodes and download them.
 
@@ -32,8 +32,8 @@ Once a download is complete, Radarr will move and rename the files for you, and 
 
 Powered by [Prowlarr][prowlarr-docs]
 
-- External Access: https://torrentsearch.{{HOMELAB_BASE_DOMAIN}}
-- Local Access: http://{{HOMELAB_HOST_LOCAL_IP}}:9696
+- External Access: https://torrentsearch.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Local Access: http://{{env.Getenv "HOMELAB_HOST_LOCAL_IP"}}:9696
 
 This is a multi-torrent-site search engine, it's pretty straightforward. Type something in the search bar, press enter. You'll see a list of results, the categories, and how many seeds / peers are available. If you press the download icon, the torrent will be immediately added to your torrent client.
 
@@ -45,8 +45,8 @@ The various DVRs use this in the background to find what's available to download
 
 Powered by [Transmission][transmission-homepage]
 
-- External Access: https://torrents.{{HOMELAB_BASE_DOMAIN}}
-- Local Access: http://{{HOMELAB_HOST_LOCAL_IP}}:9091
+- External Access: https://torrents.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Local Access: http://{{env.Getenv "HOMELAB_HOST_LOCAL_IP"}}:9091
 
 This is your torrent download client. Typically you don't interact with it very much: downloads should be added from the DVRs, or directly from your torrent search engine (nothing is stopping you from adding your own torrents if you want).
 

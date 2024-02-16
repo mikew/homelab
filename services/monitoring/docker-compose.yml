@@ -18,7 +18,7 @@ services:
     command:
       - --housekeeping_interval=15s
       - --docker_only=true
-      - --disable_metrics=advtcp,disk,diskIO,hugetlb,process,psi_avg,psi_total,resctrl,sched,tcp,udp
+      - --disable_metrics=advtcp,disk,diskIO,hugetlb,process,resctrl,sched,tcp,udp
     labels:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-cadvisor.rule=Host(`cadvisor.${HOMELAB_BASE_DOMAIN}`)

@@ -15,6 +15,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-homer.rule=Host(`dashboard.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-homer.entrypoints=web,websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-homer.middlewares=auth@file
 
   dashboard-config-generator:
     build: .

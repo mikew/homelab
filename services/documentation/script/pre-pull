@@ -44,6 +44,12 @@ docker run --rm \
   > "persistent/index.html"
 
 # Cleanup and move files
-rm combined_user_guide.md
-mv replaced.md "../../ui/$TITLE.md"
-cp persistent/index.html "../../ui/$TITLE.html"
+cat <<-EOF | docker run --rm -i --volume "$PWD/../..:/data" --env HOMELAB_USER_ID --env HOMELAB_GROUP_ID alpine sh
+rm /data/services/documentation/homelab-env
+rm /data/services/documentation/combined_user_guide.md
+mv /data/services/documentation/replaced.md "/data/ui/$TITLE.md"
+cp /data/services/documentation/persistent/index.html "/data/ui/$TITLE.html"
+
+chown \$HOMELAB_USER_ID:\$HOMELAB_GROUP_ID "/data/ui/$TITLE.md"
+chown \$HOMELAB_USER_ID:\$HOMELAB_GROUP_ID "/data/ui/$TITLE.html"
+EOF

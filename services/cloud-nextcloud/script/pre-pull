@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 set -ex
 
-mkdir -p ./persistent/nextcloud
-sudo chown 33:0 ./persistent/nextcloud
+cat <<-EOF | docker run --rm -i --volume "$PWD:/data" alpine sh
+mkdir -p /data/persistent/nextcloud
+chown 33:0 /data/persistent/nextcloud
 
-mkdir -p ./persistent/db
-sudo chown 999:999 ./persistent/db
+mkdir -p /data/persistent/db
+chown 999:999 /data/persistent/db
 
-mkdir -p ./persistent/db-dump
-sudo chown 999:999 ./persistent/db-dump
+mkdir -p /data/persistent/db-dump
+chown 999:999 /data/persistent/db-dump
 
-mkdir -p ./persistent/elasticsearch
-sudo chown 1000 ./persistent/elasticsearch
+mkdir -p /data/persistent/elasticsearch
+chown 1000 /data/persistent/elasticsearch
 
-mkdir -p ./persistent/redis
-sudo chown 999:1000 ./persistent/redis
+mkdir -p /data/persistent/redis
+chown 999:1000 /data/persistent/redis
+EOF

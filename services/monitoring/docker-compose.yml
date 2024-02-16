@@ -23,6 +23,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-cadvisor.rule=Host(`cadvisor.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-cadvisor.entrypoints=web,websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-cadvisor.middlewares=auth@file
 
   node-exporter:
     image: prom/node-exporter:latest

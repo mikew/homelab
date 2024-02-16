@@ -1,6 +1,6 @@
 ### Cloud
 
-Power by [Nextcloud](https://nextcloud.com)
+Powered by [Nextcloud](https://nextcloud.com)
 
 - External Access: https://cloud.{{HOMELAB_BASE_DOMAIN}}
 

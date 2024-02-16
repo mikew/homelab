@@ -11,7 +11,7 @@ services:
       - USER_GID=${HOMELAB_GROUP_ID}
 
       - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=${COMPOSE_PROJECT_NAME}-db-1:5432
+      - GITEA__database__HOST=db:5432
       - GITEA__database__NAME=gitea
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=gitea
@@ -33,21 +33,19 @@ services:
 
       # Indexing
       - GITEA__indexer__ISSUE_INDEXER_TYPE=bleve
-      # - GITEA__indexer__ISSUE_INDEXER_CONN_STR=http://${COMPOSE_PROJECT_NAME}-elasticsearch-1:9200
 
       - GITEA__indexer__REPO_INDEXER_ENABLED=true
       - GITEA__indexer__REPO_INDEXER_TYPE=bleve
       - GITEA__indexer__REPO_INDEXER_REPO_TYPES=sources,forks,mirrors,templates
-      # - GITEA__indexer__REPO_INDEXER_CONN_STR=http://${COMPOSE_PROJECT_NAME}-elasticsearch-1:9200
 
       # redis
       - GITEA__cache__ENABLED=true
       - GITEA__cache__ADAPTER=redis
-      - GITEA__cache__HOST=redis://${COMPOSE_PROJECT_NAME}-redis-1:6379/0
+      - GITEA__cache__HOST=redis://redis:6379/0
       - GITEA__session__PROVIDER=redis
-      - GITEA__session__PROVIDER_CONFIG=redis://${COMPOSE_PROJECT_NAME}-redis-1:6379/0
+      - GITEA__session__PROVIDER_CONFIG=redis://redis:6379/0
       - GITEA__queue__TYPE=redis
-      - GITEA__queue__CONN_STR=redis://${COMPOSE_PROJECT_NAME}-redis-1:6379/0
+      - GITEA__queue__CONN_STR=redis://redis:6379/0
 
       # Actions
       - GITEA__actions__ENABLED=true

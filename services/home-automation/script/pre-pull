@@ -19,4 +19,3 @@ http:
         servers:
           - url: http://$HOMELAB_HOST_LOCAL_IP:8123
 EOF
-

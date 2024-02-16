@@ -2,4 +2,3 @@ http:
   middlewares:
     compress:
       compress: {}
-

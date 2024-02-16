@@ -1,0 +1,9 @@
+OPS=
+MEMBERS=
+
+# These aren't secret, but if you're starting more than one server, it makes it
+# easier to share them across all servers.
+EULA=TRUE
+UID=${HOMELAB_USER_ID}
+GID=${HOMELAB_GROUP_ID}
+DEFAULT_PLAYER_PERMISSION_LEVEL=visitor

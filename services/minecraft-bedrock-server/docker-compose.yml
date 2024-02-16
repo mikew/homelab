@@ -5,12 +5,9 @@ services:
     image: itzg/minecraft-bedrock-server
     env_file: env
     environment:
-      SERVER_NAME: minecraft-bedrock-survival-server.${HOMELAB_BASE_DOMAIN}
-      GAMEMODE: survival
-      DIFFICULTY: normal
-      # mikewhy709: 2535437042564979
-      OPS: "2535437042564979"
-      MEMBERS: "1234567890,0987654321"
+      - SERVER_NAME=minecraft-bedrock-survival-server.${HOMELAB_BASE_DOMAIN}
+      - GAMEMODE=survival
+      - DIFFICULTY=normal
     ports:
       - 21234:19132/udp
     volumes:

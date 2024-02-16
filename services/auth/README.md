@@ -123,5 +123,4 @@ PROVIDER_ID=$(./occ user_oidc:provider --output json "$PROVIDER_NAME" | python -
   user_oidc \
   allow_multiple_user_backends \
   --value=0
-
 ```

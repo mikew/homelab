@@ -36,7 +36,7 @@ services:
       # Redirect to /admin because they refuse to do it themselves.
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix.redirectregex.regex=^https://dns.${HOMELAB_BASE_DOMAIN}/$
       - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix.redirectregex.replacement=https://dns.${HOMELAB_BASE_DOMAIN}/admin
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pihole.middlewares=${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pihole.middlewares=${COMPOSE_PROJECT_NAME}-pihole-redirect-prefix,auth@file
 
       - dashboard.group=Cloud
       - dashboard.name=DNS

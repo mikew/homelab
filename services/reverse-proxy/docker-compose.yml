@@ -60,6 +60,7 @@ services:
     #   - traefik.http.routers.api.rule=Host(`traefik.${HOMELAB_BASE_DOMAIN}`)
     #   - traefik.http.routers.api.entrypoints=web,websecure
     #   - traefik.http.routers.api.service=api@internal
+    #   - traefik.http.routers.api.middlewares=auth@file
 
 networks:
   reverse-proxy:

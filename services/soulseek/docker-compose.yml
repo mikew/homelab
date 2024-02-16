@@ -16,6 +16,7 @@ services:
       - SLSKD_SHARE_CACHE_STORAGE_MODE=disk
       - SLSKD_NO_HTTPS=true
       - SLSKD_NO_VERSION_CHECK=true
+      - SLSKD_NO_AUTH=true
     ports:
       - 50300:50300
     volumes:
@@ -25,6 +26,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-soulseek.rule=Host(`soulseek.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-soulseek.entrypoints=web,websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-soulseek.middlewares=auth@file
       - traefik.http.services.${COMPOSE_PROJECT_NAME}-soulseek.loadbalancer.server.port=5030
 
       - dashboard.group=Downloads

@@ -27,6 +27,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.rule=Host(`torrents.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.entrypoints=web,websecure
+      #- traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.middlewares=auth@file
 
       - dashboard.group=Downloads
       - dashboard.name=Torrents
@@ -53,6 +54,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-prowlarr.rule=Host(`torrentsearch.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-prowlarr.entrypoints=web,websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-prowlarr.middlewares=auth@file
 
       - dashboard.group=Downloads
       - dashboard.name=Torrent Search
@@ -80,6 +82,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-sonarr.rule=Host(`tvdvr.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-sonarr.entrypoints=web,websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-sonarr.middlewares=auth@file
 
       - dashboard.group=Home Theatre
       - dashboard.name=TV DVR
@@ -107,6 +110,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-radarr.rule=Host(`moviedvr.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-radarr.entrypoints=web,websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-radarr.middlewares=auth@file
 
       - dashboard.group=Home Theatre
       - dashboard.name=Movie DVR

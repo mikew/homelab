@@ -49,7 +49,7 @@ services:
 
       - dashboard.group=Cloud
       - dashboard.name=Cloud
-      - dashboard.subtitle=Nextcloud AIO
+      - dashboard.subtitle=Nextcloud
       - dashboard.url=https://cloud.${HOMELAB_BASE_DOMAIN}
       - dashboard.icon=fa fa-cloud
 

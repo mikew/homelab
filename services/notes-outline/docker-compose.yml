@@ -44,7 +44,7 @@ services:
 
       - dashboard.group=Cloud
       - dashboard.name=Notes
-      - dashboard.subtitle=Outline
+      - dashboard.subtitle=Outline. Tap Continue with Authelia.
       - dashboard.url=https://notes.${HOMELAB_BASE_DOMAIN}
       - dashboard.icon=fa fa-book
 

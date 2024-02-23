@@ -80,7 +80,7 @@ services:
 
       - dashboard.group=Source Code
       - dashboard.name=Source Code
-      - dashboard.subtitle=Gitea
+      - dashboard.subtitle=Gitea. Tap Sign in with Authelia.
       - dashboard.url=https://git.${HOMELAB_BASE_DOMAIN}
       - dashboard.icon=fa fa-code
 

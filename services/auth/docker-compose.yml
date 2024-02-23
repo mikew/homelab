@@ -20,6 +20,12 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-authelia.rule=Host(`auth.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-authelia.entrypoints=web,websecure
 
+      - dashboard.group=Cloud
+      - dashboard.name=Auth
+      - dashboard.subtitle=Authelia
+      - dashboard.url=https://auth.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-user-lock
+
   redis:
     image: redis:alpine
 

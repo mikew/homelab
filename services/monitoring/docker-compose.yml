@@ -81,6 +81,12 @@ services:
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-grafana.rule=Host(`monitoring.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-grafana.entrypoints=web,websecure
 
+      - dashboard.group=Cloud
+      - dashboard.name=Monitoring
+      - dashboard.subtitle=Grafana. Tap Sign in with Authelia.
+      - dashboard.url=https://monitoring.${HOMELAB_BASE_DOMAIN}
+      - dashboard.icon=fa fa-chart-line
+
 networks:
   reverse-proxy:
     external: true

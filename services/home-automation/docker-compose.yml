@@ -24,7 +24,7 @@ services:
     labels:
       - dashboard.group=Home Automation
       - dashboard.name=Home Automation
-      - dashboard.subtitle=Home Assistant
+      - dashboard.subtitle=Home Assistant. Enter your User Name and Password.
       - dashboard.url=https://home.${HOMELAB_BASE_DOMAIN}
       - dashboard.icon=fa fa-house-chimney
 

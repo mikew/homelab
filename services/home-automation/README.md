@@ -23,3 +23,20 @@ homeassistant:
   internal_url: !env_var INTERNAL_URL
   time_zone: !env_var TZ
 ```
+
+## Authelia Auth
+
+While Home Assistant doesn't support SSO, it can be integrated with any authentication backend. One for Authelia is included, but needs to be added to your `configuration.yaml`:
+
+```yml
+homeassistant:
+  auth_providers:
+    - type: command_line
+      meta: true
+      command: /authelia-auth
+      args:
+        - --authelia-base
+        - !env_var AUTHELIA_BASE
+        - --authelia-home-assistant-domain
+        - !env_var AUTHELIA_HOME_ASSISTANT_DOMAIN
+```

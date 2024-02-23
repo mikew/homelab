@@ -4,6 +4,7 @@ services:
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant
     volumes:
+      - ./data/authelia-auth:/authelia-auth
       - ./persistent/homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
     privileged: true
@@ -16,6 +17,10 @@ services:
       - INTERNAL_URL=http://${HOMELAB_HOST_LOCAL_IP}:8123
       - HOMELAB_LAN_CIDR
       - TZ=${HOMELAB_TIMEZONE}
+
+      # For Authelia Auth
+      - AUTHELIA_BASE=https://auth.${HOMELAB_BASE_DOMAIN}
+      - AUTHELIA_HOME_ASSISTANT_DOMAIN=home.${HOMELAB_BASE_DOMAIN}
     labels:
       - dashboard.group=Home Automation
       - dashboard.name=Home Automation

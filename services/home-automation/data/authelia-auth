@@ -1,73 +1,115 @@
 #!/usr/bin/env python
+from typing import TypedDict, Literal
 import argparse
 import os
 
 import requests
 from requests.auth import HTTPBasicAuth
 
-username = os.environ.get('username')
-password = os.environ.get('password')
 
-if username == None:
-    raise Exception('Environment variable missing: username')
+def main():
+    username = os.environ.get("username")
+    password = os.environ.get("password")
 
-if password == None:
-    raise Exception('Environment variable missing: password')
+    if username == None:
+        raise Exception("Environment variable missing: username")
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    '--authelia-base',
-    required=True,
-)
-parser.add_argument(
-    '--authelia-header-email',
-    default='Remote-Email',
-)
-parser.add_argument(
-    '--authelia-header-groups',
-    default='Remote-Groups',
-)
-parser.add_argument(
-    '--authelia-header-full-name',
-    default='Remote-Name',
-)
-parser.add_argument(
-    '--authelia-admin-group',
-    default='admins',
-)
-parser.add_argument(
-    '--authelia-home-assistant-proto',
-    default='https',
-    choices=['http', 'https'],
-)
-parser.add_argument(
-    '--authelia-home-assistant-domain',
-    required=True,
-)
+    if password == None:
+        raise Exception("Environment variable missing: password")
 
-args = vars(parser.parse_args())
+    cli_args = parse_cli_args()
+    user_info = get_authelia_user_info(username, password, cli_args)
 
-basic = HTTPBasicAuth(username, password)
-headers = {
-    'X-Forwarded-Proto': args['authelia_home_assistant_proto'],
-    'X-Forwarded-Host': args['authelia_home_assistant_domain'],
-    'X-Forwarded-URI': '/',
-}
-request = requests.get(
-    f"{args['authelia_base']}/api/verify?auth=basic",
-    auth=basic,
-    headers=headers,
-)
+    print(f"name = {user_info['full_name']}")
+    print(f"group = {user_info['home_assistant_group']}")
+    print(f"local_only = false")
 
-if not request.ok:
-    raise Exception('Could not log in')
 
-full_name = request.headers.get(args['authelia_header_full_name'], '')
-# email = request.headers.get(args['authelia_header_email'], '')
-groups = request.headers.get(args['authelia_header_groups'], '').split(',')
-is_admin = args['authelia_admin_group'] in groups
-home_assistant_group = 'system-admin' if is_admin else 'system-users'
+class ParsedCliArgs(TypedDict):
+    authelia_base: str
+    authelia_header_email: str
+    authelia_header_groups: str
+    authelia_header_full_name: str
+    authelia_admin_group: str
+    authelia_home_assistant_proto: Literal["http", "https"]
+    authelia_home_assistant_domain: str
 
-print(f"name = {full_name}")
-print(f"group = {home_assistant_group}")
-print(f"local_only = false")
+
+def parse_cli_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--authelia-base",
+        required=True,
+    )
+    parser.add_argument(
+        "--authelia-header-email",
+        default="Remote-Email",
+    )
+    parser.add_argument(
+        "--authelia-header-groups",
+        default="Remote-Groups",
+    )
+    parser.add_argument(
+        "--authelia-header-full-name",
+        default="Remote-Name",
+    )
+    parser.add_argument(
+        "--authelia-admin-group",
+        default="admins",
+    )
+    parser.add_argument(
+        "--authelia-home-assistant-proto",
+        default="https",
+        choices=["http", "https"],
+    )
+    parser.add_argument(
+        "--authelia-home-assistant-domain",
+        required=True,
+    )
+
+    # vars is Dict[str, any] which cannot be cast to a TypedDict.
+    args: ParsedCliArgs = vars(parser.parse_args())  # type: ignore
+
+    return args
+
+
+class AutheliaUserInfo(TypedDict):
+    full_name: str
+    email: str
+    groups: list[str]
+    is_admin: bool
+    home_assistant_group: str
+
+
+def get_authelia_user_info(username: str, password: str, cli_args: ParsedCliArgs):
+    basic = HTTPBasicAuth(username, password)
+    headers = {
+        "X-Forwarded-Proto": cli_args["authelia_home_assistant_proto"],
+        "X-Forwarded-Host": cli_args["authelia_home_assistant_domain"],
+        "X-Forwarded-URI": "/",
+    }
+    request = requests.get(
+        f"{cli_args['authelia_base']}/api/verify?auth=basic",
+        auth=basic,
+        headers=headers,
+    )
+
+    if not request.ok:
+        raise Exception("Could not log in")
+
+    groups = request.headers.get(cli_args["authelia_header_groups"], "").split(",")
+    is_admin = cli_args["authelia_admin_group"] in groups
+
+    user_info: AutheliaUserInfo = {
+        "full_name": request.headers.get(cli_args["authelia_header_full_name"], ""),
+        "email": request.headers.get(cli_args["authelia_header_email"], ""),
+        "groups": groups,
+        "is_admin": is_admin,
+        "home_assistant_group": "system-admin" if is_admin else "system-users",
+    }
+
+    return user_info
+
+
+if __name__ == "__main__":
+    main()

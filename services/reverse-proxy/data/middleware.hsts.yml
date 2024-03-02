@@ -6,5 +6,6 @@ http:
         contentTypeNosniff: true
         browserXssFilter: true
         forceSTSHeader: true
+        stsPreload: true
         stsSeconds: 315360000
         stsIncludeSubdomains: true

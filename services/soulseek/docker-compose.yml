@@ -17,6 +17,8 @@ services:
       - SLSKD_NO_HTTPS=true
       - SLSKD_NO_VERSION_CHECK=true
       - SLSKD_NO_AUTH=true
+      - SLSKD_UPLOAD_SPEED_LIMIT=100
+      - SLSKD_DOWNLOAD_SPEED_LIMIT=2147483647
     ports:
       - 50300:50300
     volumes:

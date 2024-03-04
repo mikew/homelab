@@ -60,6 +60,31 @@ services:
     volumes:
       - ./persistent/db:/var/lib/postgresql/data
 
+  outline-authelia-users-yml-bridge:
+    image: denoland/deno:alpine
+    command:
+      - run
+      - --allow-net
+      - --allow-env
+      - --allow-read
+      - /app/src/index.ts
+    networks:
+      - default
+      - reverse-proxy
+    volumes:
+      - ./data/outline-authelia-users-yml-bridge:/app
+      - ../auth/data/users.yml:/config/users.yml
+    env_file: outline-authelia-users-yml-bridge-env
+    environment:
+      - OUTLINE_URL=http://outline:3000
+      - AUTHELIA_USERS_FILE=/config/users.yml
+      # - DENO_LOG_LEVEL=DEBUG
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-outline-authelia-users-yml-bridge.rule=Host(`outline-authelia-users-yml-bridge.${HOMELAB_BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-outline-authelia-users-yml-bridge.entrypoints=web,websecure
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-outline-authelia-users-yml-bridge.loadbalancer.server.port=8000
+
 networks:
   reverse-proxy:
     external: true

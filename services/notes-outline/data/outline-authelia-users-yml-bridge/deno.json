@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true
+  },
+  "lock": "deno.lock",
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "semiColons": false,
+    "singleQuote": true,
+    "proseWrap": "always",
+    "include": ["src/"],
+    "exclude": []
+  },
+  "lint": {
+    "include": ["src/"],
+    "exclude": [],
+    "rules": {
+      "tags": ["recommended"],
+      "include": [],
+      "exclude": []
+    }
+  },
+  "imports": {
+    "@std/encoding": "jsr:@std/encoding@^0.218.2",
+    "@std/log": "jsr:@std/log@^0.218.2",
+    "@std/yaml": "jsr:@std/yaml@^0.218.2"
+  }
+}

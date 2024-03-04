@@ -28,17 +28,16 @@ services:
       - 32414:32414/udp
     env_file: env
     environment:
-      # Change to your timezone
-      # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
       - TZ=${HOMELAB_TIMEZONE}
-      # Allow computers on your local network to connect
       - ALLOWED_NETWORKS=${HOMELAB_LAN_CIDR},${HOMELAB_LAN_CIDR_FALLBACK}
-      # This needs to be the IP of your host machine
       - ADVERTISE_IP=http://${HOMELAB_HOST_LOCAL_IP}:32400/
     volumes:
       - ./persistent/config:/config
       - ./persistent/transcode:/transcode
       - ${HOMELAB_STORAGE_PATH}:/storage
+    # devices:
+    #   # For hardware encoding on some machines.
+    #   - /dev/dri
     labels:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-plex.rule=Host(`home-theatre.${HOMELAB_BASE_DOMAIN}`)

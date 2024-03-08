@@ -22,4 +22,4 @@ run-project-hook post-build
 
 docker-compose stop
 run-project-hook pre-up
-exec docker-compose up
+exec docker-compose up "$@"

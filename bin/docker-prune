@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -ex
+
+docker volume prune --all --force
+docker image prune --all --force
+docker network prune --force

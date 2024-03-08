@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -ex
+
+pushd / || exit 1
+
+find /patches -name '*.diff' | while read -r line; do
+  git apply --unsafe-paths "$line"
+done
+
+popd || exit 1
+
+exec /init "$@"

@@ -8,7 +8,7 @@ http:
       service: home-assistant
       rule: Host(\`home.$HOMELAB_BASE_DOMAIN\`)
       middlewares:
-        - standard@file
+        - auth@file
       entrypoints:
         - web
         - websecure
@@ -19,3 +19,5 @@ http:
         servers:
           - url: http://$HOMELAB_HOST_LOCAL_IP:8123
 EOF
+
+docker-compose rm -f

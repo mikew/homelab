@@ -1,0 +1,12 @@
+diff --git a/usr/src/homeassistant/homeassistant/components/auth/login_flow.py b/usr/src/homeassistant/homeassistant/components/auth/login_flow_mods.py
+index cc6cb5f..6d19641 100644
+--- a/usr/src/homeassistant/homeassistant/components/auth/login_flow.py
++++ b/usr/src/homeassistant/homeassistant/components/auth/login_flow.py
+@@ -325,6 +325,7 @@ class LoginFlowIndexView(LoginFlowBaseView):
+                     "ip_address": ip_address(request.remote),  # type: ignore[arg-type]
+                     "credential_only": data.get("type") == "link_user",
+                     "redirect_uri": redirect_uri,
++                    "request": request,
+                 },
+             )
+         except data_entry_flow.UnknownHandler:

@@ -5,10 +5,15 @@ services:
     image: ghcr.io/home-assistant/home-assistant
     volumes:
       - ./data/authelia-auth:/authelia-auth
+      - ./data/authelia_auth.py:/usr/src/homeassistant/homeassistant/auth/providers/authelia_auth.py
       - ./persistent/homeassistant:/config
+      - ./data/patches:/patches
+      - ./data/entrypoint:/entrypoint
       - /etc/localtime:/etc/localtime:ro
     privileged: true
     network_mode: host
+    entrypoint:
+      - /entrypoint
     ports:
       - 8123:8123
     environment:
@@ -24,7 +29,7 @@ services:
     labels:
       - dashboard.group=Home Automation
       - dashboard.name=Home Automation
-      - dashboard.subtitle=Home Assistant. Enter your User Name and Password.
+      - dashboard.subtitle=Home Assistant
       - dashboard.url=https://home.${HOMELAB_BASE_DOMAIN}
       - dashboard.icon=fa fa-house-chimney
 

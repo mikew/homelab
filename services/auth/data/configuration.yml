@@ -12,6 +12,20 @@ access_control:
   default_policy: one_factor
   #default_policy: two_factor
 
+  rules:
+    - domain: home.${HOMELAB_BASE_DOMAIN}
+      policy: bypass
+      # https://github.com/authelia/authelia/issues/1842#issuecomment-977695269
+      resources:
+        - "^/api.*"
+        - "^/auth/token.*"
+        - "^/.external_auth=."
+        - "^/service_worker.js"
+        - "^/static.*"
+        - "^/local.*"
+        - "^/hacsfiles.*"
+        - "^/frontend_latest.*"
+
 session:
   inactivity: '5m'
   expiration: '1h'

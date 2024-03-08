@@ -65,13 +65,6 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
-    # TODO Investigate
-    # depends_on:
-    #   gitea-mariadb:
-    #     condition: service_healthy
-    #   gitea-redis:
-    #     condition: service_healthy
-
     labels:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-server.rule=Host(`git.${HOMELAB_BASE_DOMAIN}`)

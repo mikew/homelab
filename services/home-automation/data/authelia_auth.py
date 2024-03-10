@@ -239,8 +239,6 @@ async def validate_authelia_session(
             f"{authelia_auth_login_flow_context['authelia_base_url']}/api/authz/auth-request",
             headers=headers,
         ) as response:
-            _LOGGER.warn(response.headers)
-
             if response.status >= 400:
                 raise Exception("Could not validate authelia_session")
 

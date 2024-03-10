@@ -1,6 +1,21 @@
-from typing import Any, cast, TypedDict
+"""
+Add this to your Home Assistant `configuration.yml`:
+
+```yml
+homeassistant:
+  auth_providers:
+    - type: authelia_auth
+      # authelia_base_url: https://auth.example.com
+      # require_authelia_session_cookie: true
+      # group_admin: admins
+      # group_read_only: read-only
+```
+"""
+
+from typing import Any, TypedDict
 import logging
 
+import aiohttp
 import voluptuous as vol
 
 from homeassistant.auth.providers import (
@@ -19,13 +34,19 @@ from homeassistant.auth.const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-CONF_GROUP_ADMIN = 'group_admin'
-CONF_GROUP_READ_ONLY = 'group_read_only'
+CONF_AUTHELIA_BASE_URL = "authelia_base_url"
+CONF_REQUIRE_AUTHELIA_SESSION_COOKIE = "require_authelia_session_cookie"
+CONF_GROUP_ADMIN = "group_admin"
+CONF_GROUP_READ_ONLY = "group_read_only"
 
-CONFIG_SCHEMA = AUTH_PROVIDER_SCHEMA.extend({
-    vol.Optional(CONF_GROUP_ADMIN, default='admins'): str,
-    vol.Optional(CONF_GROUP_READ_ONLY, default='read-only'): str,
-})
+CONFIG_SCHEMA = AUTH_PROVIDER_SCHEMA.extend(
+    {
+        vol.Optional(CONF_AUTHELIA_BASE_URL, default=""): str,
+        vol.Optional(CONF_REQUIRE_AUTHELIA_SESSION_COOKIE, default=True): bool,
+        vol.Optional(CONF_GROUP_ADMIN, default="admins"): str,
+        vol.Optional(CONF_GROUP_READ_ONLY, default="read-only"): str,
+    }
+)
 
 
 class AutheliaUserInfo(TypedDict):
@@ -33,6 +54,14 @@ class AutheliaUserInfo(TypedDict):
     full_name: str
     email: str
     groups: list[str]
+
+
+class AuthealiaAuthLoginFlowContext(TypedDict):
+    authelia_base_url: str
+    require_authelia_session_cookie: bool
+    user_info: AutheliaUserInfo | None
+    authelia_session_cookie: str
+    home_assistant_external_url: str
 
 
 @AUTH_PROVIDERS.register("authelia_auth")
@@ -48,28 +77,44 @@ class AutheliaAuthProvider(AuthProvider):
             raise Exception("Context not passed to async_login_flow")
 
         # Accesing request via context requires a patch.
-        request = context.get('request')
+        request = context.get("request")
         if request is None:
-            raise Exception('no request in context')
+            raise Exception("no request in context")
 
-        remote_user = request.headers.get('remote-user')
-        remote_name = request.headers.get('remote-name')
-        remote_groups = request.headers.get('remote-groups')
-        remote_email = request.headers.get('remote-email')
+        remote_user = request.headers.get("remote-user")
+        remote_name = request.headers.get("remote-name")
+        remote_groups = parse_authelia_groups_header(
+            request.headers.get("remote-groups")
+        )
+        remote_email = request.headers.get("remote-email")
 
-        user_info: AutheliaUserInfo | None = None
+        authelia_base_url = self.config[CONF_AUTHELIA_BASE_URL]
+        require_authelia_session_cookie = self.config[
+            CONF_REQUIRE_AUTHELIA_SESSION_COOKIE
+        ]
+
+        if require_authelia_session_cookie and not authelia_base_url:
+            raise Exception(
+                "authelia_base_url must be set when require_authelia_session_cookie is on"
+            )
+
+        authelia_auth_login_flow_context: AuthealiaAuthLoginFlowContext = {
+            "authelia_base_url": authelia_base_url,
+            "require_authelia_session_cookie": require_authelia_session_cookie,
+            "user_info": None,
+            "authelia_session_cookie": request.cookies.get("authelia_session", ""),
+            "home_assistant_external_url": self.hass.config.external_url,
+        }
 
         if remote_user and remote_name:
-            groups: list[str] = remote_groups.split(",") if remote_groups else []
-
-            user_info = {
+            authelia_auth_login_flow_context["user_info"] = {
                 "user_name": remote_user,
                 "full_name": remote_name,
-                "groups": groups,
+                "groups": remote_groups,
                 "email": remote_email,
             }
 
-        return AuthealiaAuthLoginFlow(self, user_info)
+        return AuthealiaAuthLoginFlow(self, authelia_auth_login_flow_context)
 
     async def async_get_or_create_credentials(
         self, user_info: AutheliaUserInfo
@@ -79,15 +124,19 @@ class AutheliaAuthProvider(AuthProvider):
         username = user_info["user_name"]
 
         if not username:
-            raise Exception('No username in flow_result passed to async_get_or_create_credentials')
+            raise Exception(
+                "No username in flow_result passed to async_get_or_create_credentials"
+            )
 
         for credential in await self.async_credentials():
             if credential.data["username"] == username:
                 return credential
 
-        return self.async_create_credentials({
-            "username": username,
-        })
+        return self.async_create_credentials(
+            {
+                "username": username,
+            }
+        )
 
     async def async_user_meta_for_credentials(
         self, credentials: Credentials
@@ -107,10 +156,10 @@ class AutheliaAuthProvider(AuthProvider):
         conf_group_admin = self.config[CONF_GROUP_ADMIN]
         conf_group_read_only = self.config[CONF_GROUP_READ_ONLY]
 
-        if conf_group_admin and conf_group_admin in user_info['groups']:
+        if conf_group_admin and conf_group_admin in user_info["groups"]:
             resolved_group = GROUP_ID_ADMIN
 
-        if conf_group_read_only and conf_group_read_only in user_info['groups']:
+        if conf_group_read_only and conf_group_read_only in user_info["groups"]:
             resolved_group = GROUP_ID_READ_ONLY
 
         return UserMeta(
@@ -127,29 +176,85 @@ class AuthealiaAuthLoginFlow(LoginFlow):
     def __init__(
         self,
         auth_provider: AutheliaAuthProvider,
-        user_info: AutheliaUserInfo | None,
+        authelia_auth_login_flow_context: AuthealiaAuthLoginFlowContext,
     ):
         """Initialize the login flow"""
         super().__init__(auth_provider)
-        self._user_info = user_info
+        self._authelia_auth_login_flow_context = authelia_auth_login_flow_context
 
     async def async_step_init(
         self,
         user_input: dict[str, str] | None = None,
     ) -> FlowResult:
         """Handle the step of the form."""
-        if self._user_info is None:
+        if self._authelia_auth_login_flow_context["user_info"] is None:
             return self.async_show_form(
                 step_id="init",
                 data_schema=vol.Schema({}),
-                errors={'base': 'invalid_auth'},
+                errors={"base": "invalid_auth"},
             )
 
         try:
-            return await self.async_finish(self._user_info)
+            if self._authelia_auth_login_flow_context[
+                "require_authelia_session_cookie"
+            ]:
+                await validate_authelia_session(self._authelia_auth_login_flow_context)
+
+            return await self.async_finish(
+                self._authelia_auth_login_flow_context["user_info"]
+            )
         except:
+            _LOGGER.exception("Error")
             return self.async_show_form(
                 step_id="init",
                 data_schema=vol.Schema({}),
-                errors={'base': 'invalid_auth'},
+                errors={"base": "invalid_auth"},
             )
+
+
+def parse_authelia_groups_header(groups: str | None):
+    groups_list: list[str] = groups.split(",") if groups else []
+
+    return groups_list
+
+
+async def validate_authelia_session(
+    authelia_auth_login_flow_context: AuthealiaAuthLoginFlowContext,
+):
+    user_info = authelia_auth_login_flow_context["user_info"]
+
+    if not user_info:
+        raise Exception("No user_info passed to validate_authelia_session")
+
+    headers = {
+        "Cookie": f'authelia_session={authelia_auth_login_flow_context["authelia_session_cookie"]}',
+        "X-Original-Method": "GET",
+        "X-Original-URL": authelia_auth_login_flow_context[
+            "home_assistant_external_url"
+        ],
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            f"{authelia_auth_login_flow_context['authelia_base_url']}/api/authz/auth-request",
+            headers=headers,
+        ) as response:
+            _LOGGER.warn(response.headers)
+
+            if response.status >= 400:
+                raise Exception("Could not validate authelia_session")
+
+            remote_user = response.headers.get("remote-user")
+            remote_name = response.headers.get("remote-name")
+            remote_groups = parse_authelia_groups_header(
+                response.headers.get("remote-groups")
+            )
+            remote_email = response.headers.get("remote-email")
+
+            if (
+                remote_user != user_info["user_name"]
+                or remote_name != user_info["full_name"]
+                or remote_groups != user_info["groups"]
+                or remote_email != user_info["email"]
+            ):
+                raise Exception("User info does not match")

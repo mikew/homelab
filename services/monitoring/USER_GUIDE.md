@@ -9,7 +9,7 @@ This is mostly nerdy stats, but also comes in handy if you ever want to see how 
 
 #### Recommended Dashboards:
 
-Visit https://grafana.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}/dashboard/import to import dashboards.
+Visit https://monitoring.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}/dashboard/import to import dashboards.
 
 - [Node Exporter Full](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)
 - [Docker monitoring](https://grafana.com/grafana/dashboards/193-docker-monitoring/)

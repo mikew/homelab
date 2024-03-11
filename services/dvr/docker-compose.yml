@@ -27,6 +27,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.rule=Host(`torrents.${HOMELAB_BASE_DOMAIN}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.entrypoints=web,websecure
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-transmission.loadbalancer.server.port=9091
       #- traefik.http.routers.${COMPOSE_PROJECT_NAME}-transmission.middlewares=auth@file
 
       - dashboard.group=Downloads

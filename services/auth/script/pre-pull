@@ -8,13 +8,25 @@ http:
     auth:
       forwardAuth:
         # Using the internal container + port, with the external domain in ?rd
-        address: http://authelia:9091/api/verify?rd=https://auth.${HOMELAB_BASE_DOMAIN}/
+        address: http://authelia:9091/api/authz/forward-auth?authelia_url=https://auth.${HOMELAB_BASE_DOMAIN}/
         trustForwardHeader: true
-        authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
+        authResponseHeaders:
+          - Authorization
+          - Proxy-Authorization
+          - Remote-User
+          - Remote-Groups
+          - Remote-Email
+          - Remote-Name
 
     auth-basic:
       forwardAuth:
         address: http://authelia:9091/api/verify?auth=basic
         trustForwardHeader: true
-        authResponseHeaders: Remote-User,Remote-Groups,Remote-Name,Remote-Email
+        authResponseHeaders:
+          - Authorization
+          - Proxy-Authorization
+          - Remote-User
+          - Remote-Groups
+          - Remote-Email
+          - Remote-Name
 EOF

@@ -50,6 +50,7 @@ services:
       - reverse-proxy
     volumes:
       - ./persistent/grafana:/var/lib/grafana
+      - ./data/grafana/datasource-prometheus.yml:/etc/grafana/provisioning/datasources/datasource-prometheus.yml
     env_file: env
     environment:
       - GF_SERVER_DOMAIN=monitoring.${HOMELAB_BASE_DOMAIN}

@@ -6,7 +6,7 @@ services:
     # For DHCP it is recommended to remove these ports and instead add:
     # network_mode: "host"
     networks:
-      - dns
+      - default
       - reverse-proxy
     ports:
       # TODO Re-enable when systemd-resolve issues are sorted.
@@ -45,7 +45,5 @@ services:
       - dashboard.icon=fa fa-network-wired
 
 networks:
-  dns:
-    name: dns
   reverse-proxy:
     external: true

@@ -119,6 +119,13 @@ services:
       - dashboard.url=https://moviedvr.${HOMELAB_BASE_DOMAIN}
       - dashboard.icon=fa fa-film
 
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    environment:
+      - TZ=${HOMELAB_TIMEZONE}
+      - LOG_LEVEL=info
+      #- CAPTCHA_SOLVER=none
+
 networks:
   home-theatre:
     external: true

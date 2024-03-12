@@ -2,8 +2,8 @@
 
 Powered by [Grafana](https://grafana.com/), [Prometheus](https://prometheus.io/), and [cadvisor](https://github.com/google/cadvisor)
 
-- External Access: https://monitoring.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
-- External Access: https://cadvisor.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Link: https://monitoring.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Link: https://cadvisor.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
 
 This is mostly nerdy stats, but also comes in handy if you ever want to see how your homelab is performing over time.
 

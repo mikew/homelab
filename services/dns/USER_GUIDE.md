@@ -2,7 +2,7 @@
 
 Powered by [Pi-hole](https://pi-hole.net)
 
-- External Access: https://dns.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Link: https://dns.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
 
 This is an ad-blocking DNS, which also points any requests for `{{env.Getenv "HOMELAB_BASE_DOMAIN"}}` to `{{env.Getenv "HOMELAB_HOST_LOCAL_IP"}}`.
 

@@ -2,7 +2,7 @@
 
 Powered by [Outline](https://github.com/outline/outline)
 
-- External Access: https://notes.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
+- Link: https://notes.{{env.Getenv "HOMELAB_BASE_DOMAIN"}}
 
 A simple note-taking application.
 

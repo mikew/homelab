@@ -3,3 +3,6 @@ datasources:
     type: prometheus
     url: http://prometheus:9090
     isDefault: true
+    jsonData:
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0

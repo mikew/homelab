@@ -16,9 +16,18 @@ services:
     devices:
       - /dev/kmsg
     command:
-      - --housekeeping_interval=15s
-      - --docker_only=true
-      - --disable_metrics=advtcp,disk,diskIO,hugetlb,process,resctrl,sched,tcp,udp
+      # For performance
+      - -housekeeping_interval=1m
+      # For performance
+      - -docker_only=true
+      # For performance
+      - -store_container_labels=false
+      # For performance
+      - -whitelisted_container_labels=com.docker.compose.image,com.docker.compose.project,com.docker.compose.project.working_dir,com.docker.compose.service
+      # For performance
+      # referenced_memory cleans up logs
+      # https://github.com/google/cadvisor/issues/3139
+      - -disable_metrics=advtcp,disk,diskIO,hugetlb,process,resctrl,sched,tcp,udp,referenced_memory
     labels:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}-cadvisor.rule=Host(`cadvisor.${HOMELAB_BASE_DOMAIN}`)

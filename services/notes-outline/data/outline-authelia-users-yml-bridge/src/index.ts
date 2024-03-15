@@ -11,6 +11,9 @@ import { getAutheliaUserFromEmail } from './authelia.ts'
 
 Deno.serve(async (request) => {
   try {
+    const AUTHELIA_GROUP_ADMIN = Deno.env.get('AUTHELIA_GROUP_ADMIN')
+    const AUTHELIA_GROUP_READ_ONLY = Deno.env.get('AUTHELIA_GROUP_READ_ONLY')
+
     const parsedUrl = new URL(request.url)
 
     if (parsedUrl.pathname !== '/webhook' || request.method !== 'POST') {
@@ -115,6 +118,22 @@ Deno.serve(async (request) => {
         await outlineRequest('/api/groups.add_user', {
           id: group.id,
           userId: outlineUserResponse.data.id,
+        })
+      }
+
+      if (AUTHELIA_GROUP_ADMIN && autheliaUser.groups.includes(AUTHELIA_GROUP_ADMIN)) {
+        await outlineRequest('/api/users.promote', {
+          id: outlineUserResponse.data.id,
+        })
+      } else if (AUTHELIA_GROUP_READ_ONLY && autheliaUser.groups.includes(AUTHELIA_GROUP_READ_ONLY)) {
+        await outlineRequest('/api/users.demote', {
+          id: outlineUserResponse.data.id,
+          to: 'viewer'
+        })
+      } else {
+        await outlineRequest('/api/users.demote', {
+          id: outlineUserResponse.data.id,
+          to: 'member'
         })
       }
     }

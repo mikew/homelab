@@ -78,6 +78,8 @@ services:
     environment:
       - OUTLINE_URL=http://outline:3000
       - AUTHELIA_USERS_FILE=/config/users.yml
+      - AUTHELIA_GROUP_ADMIN=admins
+      - AUTHELIA_GROUP_READ_ONLY=read-only
       # - DENO_LOG_LEVEL=DEBUG
     labels:
       - traefik.enable=true

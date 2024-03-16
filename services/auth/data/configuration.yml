@@ -14,21 +14,21 @@ server:
   endpoints:
     authz:
       forward-auth:
-        implementation: 'ForwardAuth'
+        implementation: ForwardAuth
         authn_strategies:
           # `HeaderProxyAuthorization` breaks requests that pass an Authorization header.
-          #- name: 'HeaderProxyAuthorization'
+          #- name: HeaderProxyAuthorization
           #  schemes:
-          #    - 'Basic'
-          - name: 'CookieSession'
+          #    - Basic
+          - name: CookieSession
       # Required for Home Assistant Authelia Auth provider.
       auth-request:
-        implementation: 'AuthRequest'
+        implementation: AuthRequest
         authn_strategies:
-          #- name: 'HeaderAuthRequestProxyAuthorization'
+          #- name: HeaderAuthRequestProxyAuthorization
           #  schemes:
-          #    - 'Basic'
-          - name: 'CookieSession'
+          #    - Basic
+          - name: CookieSession
 
 access_control:
   default_policy: one_factor

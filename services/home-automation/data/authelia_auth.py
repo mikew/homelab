@@ -1,4 +1,8 @@
 """
+This requires an AuthRequest Authz Endpoint with a CookieSession auth strategy
+present in your Authelia config:
+https://www.authelia.com/configuration/miscellaneous/server-endpoints-authz/#configuration
+
 Add this to your Home Assistant `configuration.yml`:
 
 ```yml
@@ -6,6 +10,8 @@ homeassistant:
   auth_providers:
     - type: authelia_auth
       # authelia_base_url: https://auth.example.com
+      # authelia_cookie_name: authelia_session
+      # authelia_auth_request_route: /api/authz/auth-request
       # require_authelia_session_cookie: true
       # group_admin: admins
       # group_read_only: read-only
@@ -35,6 +41,8 @@ from homeassistant.auth.const import (
 _LOGGER = logging.getLogger(__name__)
 
 CONF_AUTHELIA_BASE_URL = "authelia_base_url"
+CONF_AUTHELIA_COOKIE_NAME = "authelia_cookie_name"
+CONF_AUTHELIA_AUTH_REQUEST_ROUTE = "authelia_auth_request_route"
 CONF_REQUIRE_AUTHELIA_SESSION_COOKIE = "require_authelia_session_cookie"
 CONF_GROUP_ADMIN = "group_admin"
 CONF_GROUP_READ_ONLY = "group_read_only"
@@ -42,6 +50,8 @@ CONF_GROUP_READ_ONLY = "group_read_only"
 CONFIG_SCHEMA = AUTH_PROVIDER_SCHEMA.extend(
     {
         vol.Optional(CONF_AUTHELIA_BASE_URL, default=""): str,
+        vol.Optional(CONF_AUTHELIA_COOKIE_NAME, default="authelia_session"): str,
+        vol.Optional(CONF_AUTHELIA_AUTH_REQUEST_ROUTE, default="/api/authz/auth-request"): str,
         vol.Optional(CONF_REQUIRE_AUTHELIA_SESSION_COOKIE, default=True): bool,
         vol.Optional(CONF_GROUP_ADMIN, default="admins"): str,
         vol.Optional(CONF_GROUP_READ_ONLY, default="read-only"): str,
@@ -58,6 +68,8 @@ class AutheliaUserInfo(TypedDict):
 
 class AuthealiaAuthLoginFlowContext(TypedDict):
     authelia_base_url: str
+    authelia_cookie_name: str
+    authelia_auth_request_route: str
     require_authelia_session_cookie: bool
     user_info: AutheliaUserInfo | None
     authelia_session_cookie: str
@@ -89,6 +101,8 @@ class AutheliaAuthProvider(AuthProvider):
         remote_email = request.headers.get("remote-email")
 
         authelia_base_url = self.config[CONF_AUTHELIA_BASE_URL]
+        authelia_cookie_name = self.config[CONF_AUTHELIA_COOKIE_NAME]
+        authelia_auth_request_route = self.config[CONF_AUTHELIA_AUTH_REQUEST_ROUTE]
         require_authelia_session_cookie = self.config[
             CONF_REQUIRE_AUTHELIA_SESSION_COOKIE
         ]
@@ -100,9 +114,11 @@ class AutheliaAuthProvider(AuthProvider):
 
         authelia_auth_login_flow_context: AuthealiaAuthLoginFlowContext = {
             "authelia_base_url": authelia_base_url,
+            "authelia_cookie_name": authelia_cookie_name,
+            "authelia_auth_request_route": authelia_auth_request_route,
             "require_authelia_session_cookie": require_authelia_session_cookie,
             "user_info": None,
-            "authelia_session_cookie": request.cookies.get("authelia_session", ""),
+            "authelia_session_cookie": request.cookies.get(authelia_cookie_name, ""),
             "home_assistant_external_url": self.hass.config.external_url,
         }
 
@@ -227,7 +243,7 @@ async def validate_authelia_session(
         raise Exception("No user_info passed to validate_authelia_session")
 
     headers = {
-        "Cookie": f'authelia_session={authelia_auth_login_flow_context["authelia_session_cookie"]}',
+        "Cookie": f'{authelia_auth_login_flow_context["authelia_cookie_name"]}={authelia_auth_login_flow_context["authelia_session_cookie"]}',
         "X-Original-Method": "GET",
         "X-Original-URL": authelia_auth_login_flow_context[
             "home_assistant_external_url"
@@ -236,7 +252,7 @@ async def validate_authelia_session(
 
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            f"{authelia_auth_login_flow_context['authelia_base_url']}/api/authz/auth-request",
+            f"{authelia_auth_login_flow_context['authelia_base_url']}{authelia_auth_login_flow_context['authelia_auth_request_route']}",
             headers=headers,
         ) as response:
             if response.status >= 400:

@@ -7,8 +7,8 @@ http:
   middlewares:
     auth:
       forwardAuth:
-        # Using the internal container + port, with the external domain in ?rd
-        address: http://authelia:9091/api/authz/forward-auth?authelia_url=https://auth.${HOMELAB_BASE_DOMAIN}/
+        # Using the internal container + port
+        address: http://authelia:9091/api/authz/forward-auth
         trustForwardHeader: true
         authResponseHeaders:
           - Authorization

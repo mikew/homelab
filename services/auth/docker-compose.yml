@@ -1,6 +1,6 @@
 services:
   authelia:
-    image: authelia/authelia:v4.38.0-beta3
+    image: authelia/authelia
     networks:
       - default
       - reverse-proxy

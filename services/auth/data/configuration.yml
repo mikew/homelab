@@ -1,3 +1,5 @@
+theme: auto
+
 totp:
   issuer: auth.${HOMELAB_BASE_DOMAIN}
 
@@ -7,6 +9,26 @@ authentication_backend:
 
   file:
     path: /config/users.yml
+
+server:
+  endpoints:
+    authz:
+      forward-auth:
+        implementation: 'ForwardAuth'
+        authn_strategies:
+          # `HeaderProxyAuthorization` breaks requests that pass an Authorization header.
+          #- name: 'HeaderProxyAuthorization'
+          #  schemes:
+          #    - 'Basic'
+          - name: 'CookieSession'
+      # Required for Home Assistant Authelia Auth provider.
+      auth-request:
+        implementation: 'AuthRequest'
+        authn_strategies:
+          #- name: 'HeaderAuthRequestProxyAuthorization'
+          #  schemes:
+          #    - 'Basic'
+          - name: 'CookieSession'
 
 access_control:
   default_policy: one_factor
@@ -50,15 +72,15 @@ notifier:
 identity_providers:
   oidc:
     hmac_secret: ${AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET}
-    issuer_private_keys:
+    jwks:
       # Generate with `./script/authelia-crypto pair rsa generate --bits 4096 --directory /keys && cat keys/private.pem`
       - key: |
 
     clients:
 {{- if env "OIDC_GUACAMOLE_CLIENT_ID" }}
-      - description: Apache Guacamole
-        id: ${OIDC_GUACAMOLE_CLIENT_ID}
-        secret: ${OIDC_GUACAMOLE_CLIENT_SECRET}
+      - client_name: Apache Guacamole
+        client_id: ${OIDC_GUACAMOLE_CLIENT_ID}
+        client_secret: ${OIDC_GUACAMOLE_CLIENT_SECRET}
 
         pre_configured_consent_duration: 100y
         public: false
@@ -75,13 +97,14 @@ identity_providers:
 {{ end }}
 
 {{- if env "OIDC_OUTLINE_CLIENT_SECRET" }}
-      - description: Outline
-        id: ${OIDC_OUTLINE_CLIENT_ID}
-        secret: ${OIDC_OUTLINE_CLIENT_SECRET}
+      - client_name: Outline
+        client_id: ${OIDC_OUTLINE_CLIENT_ID}
+        client_secret: ${OIDC_OUTLINE_CLIENT_SECRET}
 
         pre_configured_consent_duration: 100y
         public: false
         authorization_policy: one_factor
+        token_endpoint_auth_method: client_secret_post
         redirect_uris:
           - https://notes.${HOMELAB_BASE_DOMAIN}/auth/oidc.callback
         scopes:
@@ -93,9 +116,9 @@ identity_providers:
 {{ end }}
 
 {{- if env "OIDC_GRAFANA_CLIENT_ID" }}
-      - description: Grafana
-        id: ${OIDC_GRAFANA_CLIENT_ID}
-        secret: ${OIDC_GRAFANA_CLIENT_SECRET}
+      - client_name: Grafana
+        client_id: ${OIDC_GRAFANA_CLIENT_ID}
+        client_secret: ${OIDC_GRAFANA_CLIENT_SECRET}
 
         pre_configured_consent_duration: 100y
         public: false
@@ -111,9 +134,9 @@ identity_providers:
 {{ end }}
 
 {{- if env "OIDC_GITEA_CLIENT_ID" }}
-      - description: Gitea
-        id: ${OIDC_GITEA_CLIENT_ID}
-        secret: ${OIDC_GITEA_CLIENT_SECRET}
+      - client_name: Gitea
+        client_id: ${OIDC_GITEA_CLIENT_ID}
+        client_secret: ${OIDC_GITEA_CLIENT_SECRET}
 
         pre_configured_consent_duration: 100y
         public: false
@@ -127,15 +150,15 @@ identity_providers:
           - groups
 {{ end }}
 
-
 {{- if env "OIDC_NEXTCLOUD_CLIENT_ID" }}
-      - description: Nextcloud
-        id: ${OIDC_NEXTCLOUD_CLIENT_ID}
-        secret: ${OIDC_NEXTCLOUD_CLIENT_SECRET}
+      - client_name: Nextcloud
+        client_id: ${OIDC_NEXTCLOUD_CLIENT_ID}
+        client_secret: ${OIDC_NEXTCLOUD_CLIENT_SECRET}
 
         pre_configured_consent_duration: 100y
         public: false
         authorization_policy: one_factor
+        token_endpoint_auth_method: client_secret_post
         redirect_uris:
           - https://cloud.${HOMELAB_BASE_DOMAIN}/apps/user_oidc/code
         scopes:
@@ -143,5 +166,4 @@ identity_providers:
           - profile
           - email
           - groups
-        userinfo_signing_algorithm: none
 {{ end }}
